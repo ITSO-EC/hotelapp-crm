@@ -3,7 +3,7 @@ import { User } from '../interfaces/user'
 import { storeToRefs } from 'pinia';
 import { useUsersStore } from '../stores/usersStore'
 
-const BASE_API='https://itso.ga/v1/'
+const BASE_API='https://hotelapp.fastery.dev/v1/'
 const useUsers = () => {
     const usersStore = useUsersStore();
     

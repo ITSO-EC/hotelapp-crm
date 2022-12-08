@@ -21,25 +21,25 @@
             "
           >
             <tr>
-   
-              <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
-                <div class="font-semibold text-left">Órden</div>
-              </th>
-              <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
+              <th class="px-2 pl-5 py-3 whitespace-nowrap hidden md:table-cell">
                 <div class="font-semibold text-left">Fecha</div>
               </th>
-              <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
-                <div class="font-semibold text-left">Cliente</div>
+              <th class="px-2 pl-5 py-3 whitespace-nowrap">
+                <div class="font-semibold text-left">Hora</div>
               </th>
-              <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
+              
+              <th class="px-2 pl-5 py-3 whitespace-nowrap">
+                <div class="font-semibold text-left">Huésped</div>
+              </th>
+              <th class="px-2 pl-5 py-3 whitespace-nowrap">
                 <div class="font-semibold text-left">Habitacion</div>
               </th>
-              <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
+              <th class="px-2 pr-5 py-3 whitespace-nowrap">
                 <div class="font-semibold text-left">Estado</div>
               </th>
              
              
-              <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
+              <th class="px-2 py-3 whitespace-nowrap">
                 <span class="sr-only">Menu</span>
               </th>
             </tr>

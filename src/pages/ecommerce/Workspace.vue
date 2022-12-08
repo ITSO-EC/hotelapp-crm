@@ -153,7 +153,7 @@ import PaginationClassic from '../../components/PaginationClassic.vue'
 import axios from 'axios'
 import ModalBasic from '../../components/ModalBasic.vue'
 import { useRouter, useRoute } from 'vue-router'
-import useViews from '../../composables/useViews';
+import useItems from '../../composables/useItems';
 
 import getImage from '../../composables/useResources';
 import useQueryPosts from '../../composables/useQueryPosts';
@@ -165,7 +165,7 @@ const { posts, selectedPost, error, loading, results,
     const createPostButton = ref(false);
     const editPostButton = ref(false);
     
-    const {views, selectedView, initializeViews,getViewById} = useViews();
+    const {views, selectedView, initializeViews,getViewById} = useItems();
     const router = useRouter()
     const route = useRoute()
     

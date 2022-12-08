@@ -3,21 +3,20 @@
     <!-- Row -->
     <tr>
      
-      <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
-        <div class="flex items-center text-slate-800">
+      <td class="px-2 first:pl-5 py-3 whitespace-nowrap hidden md:table-cell">
           
-          <div class="font-medium text-sky-500 overflow-hidden text-ellipsis w-24">{{ order.id }}</div>
-        </div>
+        <span class="font-medium text-sky-500">{{ convertDate(order.createdAt) }}</span>
+       
       </td>
-      <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
-        <div>{{ convertDate(order.createdAt) }}</div>
+      <td class="px-2 py-3 whitespace-nowrap">
+        <div>{{ convertTime(order.createdAt) }}</div>
       </td>
-      <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
+      <td class="px-2 pl-6 py-3 whitespace-nowrap">
         <div class="font-medium text-slate-800">{{ user.name }}</div>
       </td>
       <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
-        <div class="text-left font-medium text-emerald-500">
-          {{order.price}}
+        <div class="pl-12 font-medium text-emerald-500">
+          112
         </div>
       </td>
       <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap pr-10 w-24">
@@ -25,7 +24,7 @@
           class="inline-flex font-medium rounded-full text-center px-2.5 py-0.5 cursor-pointer"
           :class="statusColor(order.status)"
         >
-          Pendiente
+          {{getStatusText(order.status)}}
         </div>
       </td>
     
@@ -71,8 +70,8 @@
           </svg>
           
           <div class="italic">
-            <h1 class="font-bold">{{order.title}}:</h1>
-            {{ order.description }}
+            <h1 class="font-bold">Titulo:</h1>
+            Descri
           </div>
         </div>
       </td>
@@ -99,6 +98,12 @@
   
 
   const props = defineProps(['order', 'value'])
+  const convertTime = (date) => {
+    date = new Date(date)
+    let time = date.toLocaleTimeString();
+    return time;
+  }
+
 
   const convertDate = (date) => {
   const monthNames = ["Ene", "Feb", "Mar", "Abr", "May", "Jun",
@@ -107,46 +112,41 @@
 
 
   date = new Date(date)
+  
+  
   let dd = date.getDate(); 
   let mm = date.getMonth();
   let yyyy = date.getFullYear(); 
   if(dd<10){dd='0'+dd} 
-  return date = dd+'-'+monthNames[mm]+'-'+yyyy
-}
-    const descriptionOpen = ref(false);
+  return date = dd+'-'+monthNames[mm]+'-'+yyyy 
+  }
+  const descriptionOpen = ref(false);
 
-    const statusColor = (status) => {
+  const statusColor = (status) => {
       switch (status) {
-        case "Resuelta":
+        case "finished":
           return "bg-emerald-100 text-emerald-600";
-        case "Anulada":
+        case "pending":
           return "bg-amber-100 text-amber-600";
+        case "rejected":
+          return "bg-red-100 text-red-600";
         default:
-          return "bg-slate-100 text-slate-500";
+          return "bg-slate-100 text-slate-600";
       }
-    };
+  };
 
-    const typeIcon = (type) => {
-      switch (type) {
-        case "subscribed":
-          return `<svg class="w-4 h-4 fill-current text-slate-400 shrink-0 mr-2" viewBox="0 0 16 16">
-              <path d="M4.3 4.5c1.9-1.9 5.1-1.9 7 0 .7.7 1.2 1.7 1.4 2.7l2-.3c-.2-1.5-.9-2.8-1.9-3.8C10.1.4 5.7.4 2.9 3.1L.7.9 0 7.3l6.4-.7-2.1-2.1zM15.6 8.7l-6.4.7 2.1 2.1c-1.9 1.9-5.1 1.9-7 0-.7-.7-1.2-1.7-1.4-2.7l-2 .3c.2 1.5.9 2.8 1.9 3.8 1.4 1.4 3.1 2 4.9 2 1.8 0 3.6-.7 4.9-2l2.2 2.2.8-6.4z" />
-            </svg>`;
+  const getStatusText = (status) => {
+      switch (status) {
+        case "finished":
+          return "Resuelto";
+        case "pending":
+          return "En Proceso";
+        case "rejected":
+          return "Cancelado";
         default:
-          return `<svg class="w-4 h-4 fill-current text-slate-400 shrink-0 mr-2" viewBox="0 0 16 16">
-              <path d="M11.4 0L10 1.4l2 2H8.4c-2.8 0-5 2.2-5 5V12l-2-2L0 11.4l3.7 3.7c.2.2.4.3.7.3.3 0 .5-.1.7-.3l3.7-3.7L7.4 10l-2 2V8.4c0-1.7 1.3-3 3-3H12l-2 2 1.4 1.4 3.7-3.7c.4-.4.4-1 0-1.4L11.4 0z" />
-            </svg>`;
+          return "Pendiente";
       }
-    };
-
-    const typeText = (type) => {
-      switch (type) {
-        case "subscribed":
-          return "Suscripción"
-        case "refunded":
-          return "Devolución"
-      }
-    };
+  };
 
     
   const getFileType = () => {

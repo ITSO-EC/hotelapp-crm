@@ -4,7 +4,7 @@ import { storeToRefs } from 'pinia';
 import { Order } from '../interfaces/order';
 import { useOrdersStore } from '../stores/ordersStore';
 
-const BASE_API='https://itso.ga/v1/'
+const BASE_API='https://hotelapp.fastery.dev/v1/'
 
 const useOrders = () => {
     const ordersStore = useOrdersStore();

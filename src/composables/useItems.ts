@@ -1,38 +1,38 @@
 import { storeToRefs } from 'pinia';
-import { useViewsStore } from '../stores/viewsStore'
+import { useItemsStore } from '../stores/itemsStore'
 import axios from 'axios';
-import { View } from '../interfaces/view';
+import { Item } from '../interfaces/item';
 
-const useViews = () => {
-    const viewsStore = useViewsStore();
+const useItems = () => {
+    const itemsStore = useItemsStore();
     
     const BASE_API='https://itso.ga/v1/'
     
-    const { views , queriedViews , selectedView , error, loading, results, page, pages} = storeToRefs(viewsStore);
-    //'/api/views'
-    const initializeViews = async (selpage: number = 1) => {
+    const { items , queriedItems , selectedItem , error, loading, results, page, pages} = storeToRefs(itemsStore);
+    //'/api/Items'
+    const initializeItems = async (selpage: number = 1) => {
       
-        viewsStore.toggleLoading(true);
+        itemsStore.toggleLoading(true);
         try {
-          viewsStore.loadViews(await axios.get(BASE_API+'pages?limit=8&page='+selpage))
-          viewsStore.toggleLoading(false);
+          itemsStore.loadItems(await axios.get(BASE_API+'pages?limit=8&page='+selpage))
+          itemsStore.toggleLoading(false);
           
         } catch (err) {
           error.value = err;
-          viewsStore.toggleLoading(false);
+          itemsStore.toggleLoading(false);
         }
         
     };
 
     const nextPage = async (actualpage:number) => {
-      await initializeViews(actualpage+1);
+      await initializeItems(actualpage+1);
     }
     const prevPage = async (actualpage:number) => {
-      await initializeViews(actualpage-1);
+      await initializeItems(actualpage-1);
     }
 
 
-    const createView = async( payload ) =>{
+    const createItem = async( payload ) =>{
         loading.value = true;
        
         if(payload.image_url.size/1000 > 300) {
@@ -48,7 +48,7 @@ const useViews = () => {
               'Content-type':'multipart/form-data'
             }
           })
-          initializeViews(page.value);
+          initializeItems(page.value);
           loading.value = false;
         } catch (err) {
           error.value = err;
@@ -58,12 +58,12 @@ const useViews = () => {
     };
 
 
-    const getViewById = (id) => {
-      viewsStore.getViewById(id)
+    const getItemById = (id) => {
+      itemsStore.getItemById(id)
     };
-    const filterByName = (querytext: string)=> viewsStore.filterByValue(querytext);
+    const filterByName = (querytext: string)=> itemsStore.filterByValue(querytext);
 
-    const updateView = async( payload:View, id:string ) =>{
+    const updateItem = async( payload:Item, id:string ) =>{
       loading.value = true;
       
       if(payload.image_url.size/1000 > 300) {
@@ -79,7 +79,7 @@ const useViews = () => {
             'Content-type':'multipart/form-data'
           }
         })
-        initializeViews(page.value);
+        initializeItems(page.value);
         loading.value = false;
       } catch (err) {
         error.value = err;
@@ -88,14 +88,14 @@ const useViews = () => {
       
   };
 
-    const deleteView = async (id:string) => {
+    const deleteItem = async (id:string) => {
       loading.value = true;
       
       try {
         await axios.delete(BASE_API+'pages/'+id);
         loading.value = false;
         
-        initializeViews(page.value);
+        initializeItems(page.value);
 
       } catch (err) {
         
@@ -108,9 +108,9 @@ const useViews = () => {
     }
     return {
         // Properties
-        views,
-        queriedViews,
-        selectedView,
+        items,
+        queriedItems,
+        selectedItem,
         error,
         loading,
         results,
@@ -118,15 +118,15 @@ const useViews = () => {
         pages,
 
         //methods
-        createView,
-        updateView,
+        createItem,
+        updateItem,
         nextPage,
         prevPage,
-        deleteView,
-        initializeViews,
+        deleteItem,
+        initializeItems,
         filterByName,
-        getViewById 
+        getItemById 
 
     }
 }
-export default useViews;
+export default useItems;

@@ -307,7 +307,7 @@ import ModalBasic from '../../components/ModalBasic.vue'
 import ModalBlank from '../../components/ModalBlank.vue'
 import Toast from '../../components/Toast.vue'
 import PaginationClassic from '../../components/PaginationClassic.vue'
-import useViews from '../../composables/useViews';
+import useItems from '../../composables/useItems';
  
 
     const newPage = ref({
@@ -325,7 +325,7 @@ import useViews from '../../composables/useViews';
     const deleteViewModalOpen = ref(false);
 
     const query = ref('');
-    const {views, queriedViews,error, loading, results, page, createView, updateView, deleteView, initializeViews, filterByName} = useViews();
+    const {views, queriedViews,error, loading, results, page, createView, updateView, deleteView, initializeViews, filterByName} = useItems();
 
 
     function resetData() {  

@@ -32,7 +32,7 @@
   import useOrders from '../composables/useOrders';
   import useUsers from '../composables/useUsers';
   import useCategories from '../composables/useCategories';
-  import useViews from '../composables/useViews';
+  import useItems from '../composables/useItems';
   import useQueryPosts from '../composables/useQueryPosts';
   const props = defineProps(['items','results', 'type'])
 
@@ -110,7 +110,7 @@
     }  
     if (props.type == 'views')
     {    
-      const {loading, pages,page,nextPage} = useViews();
+      const {loading, pages,page,nextPage} = useItems();
       console.log('page', page.value, 'pages', pages.value)
       if(page.value < pages.value) 
       {
@@ -190,7 +190,7 @@
     }  
     if (props.type == 'views')
     {    
-      const {loading, page,prevPage} = useViews();
+      const {loading, page,prevPage} = useItems();
       if(page.value > 1) 
       {
         availablenext.value = true;

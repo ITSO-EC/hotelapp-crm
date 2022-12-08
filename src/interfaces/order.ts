@@ -1,10 +1,6 @@
 export interface Order{
     id: string;
-    title: string;
-    price: number;
-    type: string;
-    description: string;
+    statud: string;
+    items: string[];
     user: string;
-    file_url: string;
-    
 }

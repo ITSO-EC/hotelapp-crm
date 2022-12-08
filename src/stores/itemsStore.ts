@@ -1,11 +1,11 @@
 import { defineStore} from 'pinia';
-import { View } from '../interfaces/view';
+import { Item } from '../interfaces/item';
 
 
-interface ViewsState {
-    views: View[];
-    queriedViews: View[];
-    selectedView: Object;
+interface ItemsState {
+    items: Item[];
+    queriedItems: Item[];
+    selectedItem: Object;
     loading: boolean;
     error: String;
     results: number;
@@ -13,12 +13,12 @@ interface ViewsState {
     pages: number
 }
 
-export const useViewsStore = defineStore({
-    id: 'views',
-    state: (): ViewsState => ({
-        views: [] ,
-        queriedViews: [],
-        selectedView: {},
+export const useItemsStore = defineStore({
+    id: 'items',
+    state: (): ItemsState => ({
+        items: [] ,
+        queriedItems: [],
+        selectedItem: {},
         error: '',
         loading: false,
         results: 0,
@@ -29,20 +29,20 @@ export const useViewsStore = defineStore({
        
     },
     actions: {
-        getViewById(id) {
+        getItemById(id) {
             
-            this.selectedView = this.views.find((view) =>  view.id === id);
+            this.selectedItem = this.items.find((item) =>  item.id === id);
         },
         filterByValue (text) {
-            this.queriedViews = [...this.views];
-            let sorted =  this.queriedViews?.filter(o =>
+            this.queriedItems = [...this.items];
+            let sorted =  this.queriedItems?.filter(o =>
              o["name"]?.toString().toLowerCase().includes(text?.toString().toLowerCase()));
-            this.queriedViews = sorted;
+            this.queriedItems = sorted;
         },
-        loadViews(data) {
+        loadItems(data) {
             try {   
-                this.views = data.data.results;
-                this.queriedViews = data.data.results;
+                this.items = data.data.results;
+                this.queriedItems = data.data.results;
                 this.results = data.data.totalResults;
                 this.page = data.data.page;
                 
@@ -58,12 +58,12 @@ export const useViewsStore = defineStore({
         toggleLoading( status: boolean ) {
             this.loading = status;
         },
-        async addView(view: Object): Promise<void> {
+        async addItem(item: Object): Promise<void> {
             this.loading = true;
-            this.views.push(view);
+            this.items.push(item);
             this.loading = false;
         },
-        async deleteView(id: number): Promise<void> {
+        async deleteItem(id: number): Promise<void> {
             this.loading = true;
             this.posts = this.posts.filter((post) => post.id !== id);
             this.loading = false;
