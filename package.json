@@ -19,6 +19,7 @@
     "vue-router": "^4.1.2"
   },
   "devDependencies": {
+    "@faker-js/faker": "^7.6.0",
     "@vitejs/plugin-vue": "^3.0.0",
     "@vue/compiler-sfc": "^3.2.20",
     "autoprefixer": "^10.4.7",

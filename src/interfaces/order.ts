@@ -1,6 +1,6 @@
 export interface Order{
-    id: string;
-    statud: string;
-    items: string[];
+    id?: string;
+    status: string;
+    item: string;
     user: string;
 }

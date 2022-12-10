@@ -35,17 +35,12 @@ const useRooms = () => {
     const createRoom = async( payload ) =>{
         loading.value = true;
        
-        if(payload.image_url.size/1000 > 300) {
-          loading.value = false;
-          error.value = 'La imagen excede el peso máximo (300kB)'
-          return;
-          
-        } 
+      
 
         try {
           await axios.post(BASE_API+'', payload ,{
             headers: {
-              'Content-type':'multipart/form-data'
+              'Content-type':'application/json'
             }
           })
           initializeRooms(page.value);

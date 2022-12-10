@@ -1,5 +1,5 @@
 <template>
-  <div class="col-span-full sm:col-span-6 xl:col-span-4 bg-white shadow-lg rounded-sm border border-slate-200">
+  <div class="col-span-full sm:col-span-6  bg-white shadow-lg rounded-sm border border-slate-200">
     <div class="px-5 pt-5 flex flex-col h-full">
       <header class="flex justify-between items-start mb-2">
         <!-- Icon -->
@@ -9,95 +9,128 @@
 
         <EditMenu align="right" class="relative inline-flex">
           <li>
-            <a class="font-medium text-sm text-slate-600 hover:text-slate-800 flex py-1 px-3" href="#0">Cambiar wifi</a>
+            <span class="cursor-pointer font-medium text-sm text-slate-600 hover:text-slate-800 flex py-1 px-3" @click.stop="editWifiModal = true">Cambiar wifi</span>
           </li>
           <li>
-            <a class="font-medium text-sm text-slate-600 hover:text-slate-800 flex py-1 px-3" href="#0">Cambiar Clave Puerta</a>
+            <span class="cursor-pointer font-medium text-sm text-slate-600 hover:text-slate-800 flex py-1 px-3" @click.stop="editDoorKeyModal = true">Cambiar Clave Puerta</span>
           </li>
           
         </EditMenu>
       </header>
       <div class="my-4">
         <h2 class="text-lg font-semibold text-slate-800 mb-2">Clave del Wifi</h2>
-        <div class="text-xs font-semibold text-slate-400 uppercase mb-1">12345678</div>
+        <div class="text-md font-semibold text-slate-400 uppercase mb-1">{{wifiCode.description}}</div>
         <h2 class="text-lg font-semibold text-slate-800 mb-2">Clave de la Puerta Exterior</h2>
-        <div class="text-xs font-semibold text-slate-400 uppercase mb-1">abcdefgh</div>
+        <div class="text-md font-semibold text-slate-400 uppercase mb-1">{{doorKey.description}}</div>
       </div>
       
      
     </div>
-   
+     <!-- Edit Wifi -->
+     <ModalBasic
+      :modalOpen="editWifiModal"
+      @close-modal="editWifiModal = false"
+      title="Modificar Clave Wifi"
+    >
+      <!-- Modal content -->
+      <div class="px-5 pt-4 pb-1">
+        <div class="text-sm">
+          <div class="space-y-2 grid grid-cols-1 sm:grid-cols-2 gap-4">
+            
+            <!-- Start -->
+            <div class="sm:col-span-2">
+              <label class="block text-sm font-medium mb-1 mt-2" for="wificode"
+                >Clave Wifi</label
+              >
+              <input id="wificode" class="form-input w-full" type="text" v-model="wifiCode.description"/>
+            </div>
+        
+          </div>
+        </div>
+      </div>
+      <!-- Modal footer -->
+      <div class="px-5 py-4">
+        <div class="flex flex-wrap justify-end space-x-2">
+          <button
+            class="
+              btn-sm
+              border-slate-200
+              hover:border-slate-300
+              text-slate-600
+            "
+            @click.stop="editWifiModal = false"
+          >
+            Cancelar
+          </button>
+          <button :disabled="loading" @click="editWifiModal=false; updateItem({description: wifiCode.description}, wifiCode.id)" class="btn-sm disabled:bg-indigo-300 bg-indigo-500 hover:bg-indigo-600 text-white">
+            Guardar
+          </button>
+        </div>
+      </div>
+    </ModalBasic>
+     <!-- Edit DoorKey -->
+     <ModalBasic
+      :modalOpen="editDoorKeyModal"
+      @close-modal="editDoorKeyModal = false"
+      title="Modificar Clave de la Puerta Exterior"
+    >
+      <!-- Modal content -->
+      <div class="px-5 pt-4 pb-1">
+        <div class="text-sm">
+          <div class="space-y-2 grid grid-cols-1 sm:grid-cols-2 gap-4">
+            
+            <!-- Start -->
+            <div class="sm:col-span-2">
+              <label class="block text-sm font-medium mb-1 mt-2" for="doorkey"
+                >Clave de la Puerta</label
+              >
+              <input id="doorkey" class="form-input w-full" type="text" v-model="doorKey.description"/>
+            </div>
+  
+        
+        
+          </div>
+        </div>
+      </div>
+      <!-- Modal footer -->
+      <div class="px-5 py-4">
+        <div class="flex flex-wrap justify-end space-x-2">
+          <button
+            class="
+              btn-sm
+              border-slate-200
+              hover:border-slate-300
+              text-slate-600
+            "
+            @click.stop="editDoorKeyModal = false"
+          >
+            Cancelar
+          </button>
+          <button :disabled="loading" @click="editDoorKeyModal=false; updateItem({description: doorKey.description}, doorKey.id)" class="btn-sm disabled:bg-indigo-300 bg-indigo-500 hover:bg-indigo-600 text-white">
+            Guardar
+          </button>
+        </div>
+      </div>
+    </ModalBasic>
   </div>
 </template>
 
-<script>
+<script setup>
 import { ref } from 'vue'
 import LineChart from '../../charts/LineChart01.vue'
 import EditMenu from '../../components/DropdownEditMenu.vue'
+import useItems from '../../composables/useItems'
+import ModalBasic from '../../components/ModalBasic.vue'
 
 // Import utilities
 import { tailwindConfig, hexToRGB } from '../../utils/Utils'
+const {getWifi, getDoorKey, loading, updateItem} = useItems();
+const wifiCode = ref({});
+const doorKey = ref({});
+const editWifiModal = ref(false);
+const editDoorKeyModal = ref(false);
 
-export default {
-  name: 'DashboardCard01',
-  components: {
-    LineChart,
-    EditMenu,
-  },
-  setup() {
-    const chartData = ref({
-      labels: [
-        '12-01-2020', '01-01-2021', '02-01-2021',
-        '03-01-2021', '04-01-2021', '05-01-2021',
-        '06-01-2021', '07-01-2021', '08-01-2021',
-        '09-01-2021', '10-01-2021', '11-01-2021',
-        '12-01-2021', '01-01-2022', '02-01-2022',
-        '03-01-2022', '04-01-2022', '05-01-2022',
-        '06-01-2022', '07-01-2022', '08-01-2022',
-        '09-01-2022', '10-01-2022', '11-01-2022',
-        '12-01-2022', '01-01-2023',
-      ],
-      datasets: [
-        // Indigo line
-        {
-          data: [
-            732, 610, 610, 504, 504, 504, 349,
-            349, 504, 342, 504, 610, 391, 192,
-            154, 273, 191, 191, 126, 263, 349,
-            252, 423, 622, 470, 532,
-          ],
-          fill: true,
-          backgroundColor: `rgba(${hexToRGB(tailwindConfig().theme.colors.blue[500])}, 0.08)`,
-          borderColor: tailwindConfig().theme.colors.indigo[500],
-          borderWidth: 2,
-          tension: 0,
-          pointRadius: 0,
-          pointHoverRadius: 3,
-          pointBackgroundColor: tailwindConfig().theme.colors.indigo[500],
-          clip: 20,
-        },
-        // Gray line
-        {
-          data: [
-            532, 532, 532, 404, 404, 314, 314,
-            314, 314, 314, 234, 314, 234, 234,
-            314, 314, 314, 388, 314, 202, 202,
-            202, 202, 314, 720, 642,
-          ],
-          borderColor: tailwindConfig().theme.colors.slate[300],
-          borderWidth: 2,
-          tension: 0,
-          pointRadius: 0,
-          pointHoverRadius: 3,
-          pointBackgroundColor: tailwindConfig().theme.colors.slate[300],
-          clip: 20,
-        },
-      ],
-    })
+getWifi().then(res=>wifiCode.value = res.data.results[0])
+getDoorKey().then(res=>doorKey.value = res.data.results[0])
 
-    return {
-      chartData,
-    } 
-  }
-}
 </script>

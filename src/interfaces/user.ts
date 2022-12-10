@@ -1,9 +1,12 @@
 export interface User { 
-    id: string,
+    id?: string,
     name: string,
     email: string,
     role: string,
     phoneNumber: string,
+    room?: string,
+    password?:string,
+    imageUrl?: string[],
     isEmailVerified?: boolean,
     allowPushNotifications?: boolean,
     allowWhatsappMessages?: boolean,

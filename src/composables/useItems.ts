@@ -6,7 +6,7 @@ import { Item } from '../interfaces/item';
 const useItems = () => {
     const itemsStore = useItemsStore();
     
-    const BASE_API='https://itso.ga/v1/'
+    const BASE_API='https://hotelapp.fastery.dev/v1/'
     
     const { items , queriedItems , selectedItem , error, loading, results, page, pages} = storeToRefs(itemsStore);
     //'/api/Items'
@@ -14,7 +14,7 @@ const useItems = () => {
       
         itemsStore.toggleLoading(true);
         try {
-          itemsStore.loadItems(await axios.get(BASE_API+'pages?limit=8&page='+selpage))
+          itemsStore.loadItems(await axios.get(BASE_API+'items?&page='+selpage))
           itemsStore.toggleLoading(false);
           
         } catch (err) {
@@ -24,6 +24,57 @@ const useItems = () => {
         
     };
 
+    const getBreakfast = async (selpage: number = 1) => {
+      
+      itemsStore.toggleLoading(true);
+      
+      try {
+        return await axios.get(BASE_API+'items?name=Desayuno')
+        
+      } catch (err) {
+        error.value = err;
+        return err;
+         
+      }
+      finally {
+        itemsStore.toggleLoading(false);
+      }
+      
+  };
+  const getWifi = async (selpage: number = 1) => {
+      
+    itemsStore.toggleLoading(true);
+    
+    try {
+      return await axios.get(BASE_API+'items?name=WifiCode')
+      
+    } catch (err) {
+      error.value = err;
+      return err;
+       
+    }
+    finally {
+      itemsStore.toggleLoading(false);
+    }
+    
+};
+const getDoorKey = async (selpage: number = 1) => {
+      
+  itemsStore.toggleLoading(true);
+  
+  try {
+    return await axios.get(BASE_API+'items?name=DoorKey')
+    
+  } catch (err) {
+    error.value = err;
+    return err;
+     
+  }
+  finally {
+    itemsStore.toggleLoading(false);
+  }
+  
+};
     const nextPage = async (actualpage:number) => {
       await initializeItems(actualpage+1);
     }
@@ -35,15 +86,9 @@ const useItems = () => {
     const createItem = async( payload ) =>{
         loading.value = true;
        
-        if(payload.image_url.size/1000 > 300) {
-          loading.value = false;
-          error.value = 'La imagen excede el peso máximo (300kB)'
-          return;
-          
-        } 
 
         try {
-          await axios.post(BASE_API+'pages', payload ,{
+          await axios.post(BASE_API+'items', payload ,{
             headers: {
               'Content-type':'multipart/form-data'
             }
@@ -63,20 +108,14 @@ const useItems = () => {
     };
     const filterByName = (querytext: string)=> itemsStore.filterByValue(querytext);
 
-    const updateItem = async( payload:Item, id:string ) =>{
+    const updateItem = async( payload, id:string ) =>{
       loading.value = true;
       
-      if(payload.image_url.size/1000 > 300) {
-        loading.value = false;
-        error.value = 'La imagen excede el peso máximo (300kB)'
-        return;
-        
-      } 
 
       try {
-        await axios.patch(BASE_API+'pages/'+id, payload ,{
+        await axios.patch(BASE_API+'items/'+id, payload ,{
           headers: {
-            'Content-type':'multipart/form-data'
+            'Content-type':'application/json'
           }
         })
         initializeItems(page.value);
@@ -92,7 +131,7 @@ const useItems = () => {
       loading.value = true;
       
       try {
-        await axios.delete(BASE_API+'pages/'+id);
+        await axios.delete(BASE_API+'items/'+id);
         loading.value = false;
         
         initializeItems(page.value);
@@ -123,6 +162,9 @@ const useItems = () => {
         nextPage,
         prevPage,
         deleteItem,
+        getBreakfast,
+        getWifi,
+        getDoorKey,
         initializeItems,
         filterByName,
         getItemById 

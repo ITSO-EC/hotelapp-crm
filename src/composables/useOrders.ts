@@ -15,7 +15,7 @@ const useOrders = () => {
 
     const initializeAllOrders = async (page:number=1) => {
       loading.value = true;
-      ordersStore.loadOrders(await axios.get(BASE_API+'orders/?populate=item,user&page='+page));  
+      ordersStore.loadOrders(await axios.get(BASE_API+'orders?populate=item,user&page='+page));  
       loading.value = false;
     }
     const retrieveOrdersByUser = async (userid:string,page:number=1) => {
@@ -23,7 +23,7 @@ const useOrders = () => {
     }
     const retrieveRooftopOrders = async (page:number=1) => {
       loading.value = true;
-      ordersStore.loadOrders(await axios.get(BASE_API+'orders?item=63937cc98320bc07c1b97ffa&populate=item,user&page='+page));
+      ordersStore.loadOrders(await axios.get(BASE_API+'orders?item=63945f93c33e836efa9d3c7b&populate=item,user&page='+page));
       loading.value = false;
     }
 
@@ -44,7 +44,7 @@ const useOrders = () => {
         await axios.post(BASE_API+'orders',{...payload},
         {
           headers: {
-            'Content-type':'multipart/form-data'
+            'Content-type':'application/json'
           }
         })
         loading.value = false;

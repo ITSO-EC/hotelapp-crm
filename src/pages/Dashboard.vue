@@ -25,6 +25,7 @@
             <DashboardCard04 />
             <!-- Claves -->
             <DashboardCard01 />
+            <DashboardCardMenu/>
          
           </div>
 
@@ -36,7 +37,7 @@
   </div>
 </template>
 
-<script>
+<script setup>
 import { ref } from 'vue'
 import Sidebar from '../partials/Sidebar.vue'
 import Header from '../partials/Header.vue'
@@ -46,32 +47,43 @@ import FilterButton from '../components/DropdownFilter.vue'
 import Datepicker from '../components/Datepicker.vue'
 
 import DashboardCard01 from '../partials/dashboard/DashboardCard01.vue'
+import DashboardCardMenu from '../partials/dashboard/DashboardCardMenu.vue'
 import DashboardCard02 from '../partials/dashboard/DashboardCard02.vue'
 import DashboardCard04 from '../partials/dashboard/DashboardCard04.vue'
 import DashboardCard10 from '../partials/dashboard/DashboardCard10.vue'
 
-export default {
-  name: 'Dashboard',
-  components: {
-    Sidebar,
-    Header,
-    WelcomeBanner,
-    DashboardAvatars,
-    FilterButton,
-    Datepicker,
-  
-    DashboardCard01,
-    DashboardCard02,
-    DashboardCard04,
-    DashboardCard10,
-  },
-  setup() {
 
-    const sidebarOpen = ref(false)
+import usersFactory from '../factories/userFactory'
+import itemsFactory from '../factories/itemFactory'
+import ordersFactory from '../factories/orderFactory'
+import roomsFactory from '../factories/roomFactory'
 
-    return {
-      sidebarOpen,
-    }  
-  }
-}
+const sidebarOpen = ref(false)
+const {generateUsers,initializeUsers,destroyUsers} = usersFactory();
+const {generateItems,initializeItems,destroyItems} = itemsFactory();
+const {generateOrders,initializeAllOrders,destroyOrders} = ordersFactory();
+const {generateRooms,initializeRooms,destroyRooms} = roomsFactory();
+
+
+//Genera Habs. / Borra Habs.
+//generateRooms()
+//destroyRooms()
+
+//Genera Usuarios / Borra
+//initializeUsers()
+//.then((res) => {
+//  generateUsers(20);
+//  destroyUsers();
+//});
+
+//Genera Items / Borra (No olvidar modificar los ids del RooftopOrders)
+//initializeItems()
+//.then((res) => {
+  //generateItems();
+  //destroyItems();
+//});
+
+//Genera Orders / Borra 
+//generateOrders(20);
+//destroyOrders()
 </script>
