@@ -109,7 +109,13 @@
               
               </select>
             </div>
-           
+            <!-- Start -->
+            <div class="sm:col-span-2 h-fit">
+              <label class="block text-sm font-medium mb-1 h-12" :for="`gallery-${customer.id}`"
+                >Galería</label
+              >
+              <ViewPictures :gallery="customer.imageUrl" :userid="customer.id"></ViewPictures>
+            </div>
           </div>
         </div>
       </div>
@@ -204,6 +210,7 @@
 import useUsers from '../../composables/useUsers';
 import useAuth from '../../composables/useAuth';
 import EditMenu from "../../components/DropdownEditMenu.vue";
+import ViewPictures from './ViewPictures.vue'
 import { defineProps, onMounted,ref } from 'vue';
 
 import ModalBasic from "../../components/ModalBasic.vue";

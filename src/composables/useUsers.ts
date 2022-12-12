@@ -52,9 +52,9 @@ const useUsers = () => {
         }
         
       
-      };
+    };
 
-      const editUser = async(payload:User, id:string) => {
+    const editUser = async(payload:User, id:string) => {
         loading.value = true;
         try {
           await axios.patch(BASE_API+'users/'+id, payload)
@@ -67,9 +67,9 @@ const useUsers = () => {
           
           initializeClients()
         }
-       };
+    };
   
-      const deleteUser = async(id:string) => {
+    const deleteUser = async(id:string) => {
         loading.value = true;
         axios.delete(BASE_API+'users/'+id)
         .then(response => {
@@ -80,7 +80,27 @@ const useUsers = () => {
           loading.value = false    
           error.value = err.response.data.message;
         });
-      };
+    };
+
+    const addImage = async(payload, userid) => {
+      await axios.patch(BASE_API+'users/addImages/'+userid,payload,
+      {
+        headers: {
+          'Content-Type' : 'multipart/form-data'
+        }
+      })
+      await initializeClients();
+    }
+    const deleteImage = async(payload, userid) => {
+      await axios.patch(BASE_API+'users/deleteImages/'+userid,
+      {
+        headers: {
+          'Content-Type' : 'multipart/form-data'
+        }
+      })
+      await initializeClients();
+    }
+  
   
     return {
         // Properties
@@ -95,6 +115,8 @@ const useUsers = () => {
 
         //methods
         nextPage,
+        addImage,
+        deleteImage,
         prevPage,
         createUser,
         editUser,
