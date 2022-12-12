@@ -45,15 +45,14 @@
 
     <!-- Content -->
     <div class="relative">
-      <h1 class="text-2xl md:text-3xl text-slate-800 font-bold mb-1">Saludos, Andres 👋</h1>
+      <h1 class="text-2xl md:text-3xl text-slate-800 font-bold mb-1">Saludos, {{user?.name}} 👋</h1>
       <p>A continuación, se presenta un resumen de actividades:</p>
     </div>
 
   </div>
 </template>
 
-<script>
-export default {
-  name: 'WelcomeBanner',
-}
+<script setup>
+import useAuth from '../../composables/useAuth';
+const { user } = useAuth();
 </script>

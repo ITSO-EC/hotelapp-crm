@@ -8,7 +8,7 @@
 
           <!-- Hamburger button -->
           <button class="text-slate-500 hover:text-slate-600 lg:hidden" @click.stop="$emit('toggle-sidebar')" aria-controls="sidebar" :aria-expanded="sidebarOpen">
-            <span class="sr-only">Open sidebar</span>
+            <span class="sr-only">Abrir Barra Lateral</span>
             <svg class="w-6 h-6 fill-current" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
               <rect x="4" y="5" width="16" height="2" />
               <rect x="4" y="11" width="16" height="2" />
@@ -23,7 +23,7 @@
 
           <!-- Divider -->
           <hr class="w-px h-6 bg-slate-200" />
-          <UserMenu align="right" />
+          <UserMenu :key="loading" align="right" :user="user"/>
 
         </div>
 
@@ -32,28 +32,17 @@
   </header>
 </template>
 
-<script>
+<script setup>
 import { ref } from 'vue'
 
 import SearchModal from '../components/ModalSearch.vue'
 import Notifications from '../components/DropdownNotifications.vue'
 import Help from '../components/DropdownHelp.vue'
 import UserMenu from '../components/DropdownProfile.vue'
+import useAuth from '../composables/useAuth'
 
-export default {
-  name: 'Header',
-  props: ['sidebarOpen'],
-  components: {
-    SearchModal,
-    Notifications,
-    Help,
-    UserMenu,
-  },
-  setup() {
-    const searchModalOpen = ref(false)
-    return {
-      searchModalOpen,
-    }  
-  }  
-}
+const props = defineProps(['sidebarOpen']);
+const searchModalOpen = ref(false)
+const { user, loading } = useAuth();
+
 </script>

@@ -7,9 +7,9 @@
       @click.prevent="dropdownOpen = !dropdownOpen"
       :aria-expanded="dropdownOpen"
     >
-      <img class="w-8 h-8 rounded-full" :src="UserAvatar" width="32" height="32" alt="User" />
+      <img class="w-8 h-8 rounded-full" :src="`${user?.imageUrl.length >0 ? getImage(user.profileImageUrl): previewImage}`" width="32" height="32" alt="User" />
       <div class="flex items-center truncate">
-        <span class="truncate ml-2 text-sm font-medium group-hover:text-slate-800">Andres</span>
+        <span class="truncate ml-2 text-sm font-medium group-hover:text-slate-800">{{user.name}}</span>
         <svg class="w-3 h-3 shrink-0 ml-1 fill-current text-slate-400" viewBox="0 0 12 12">
           <path d="M5.9 11.4L.5 6l1.4-1.4 4 4 4-4L11.3 6z" />
         </svg>
@@ -25,8 +25,8 @@
     >
       <div v-show="dropdownOpen" class="origin-top-right z-10 absolute top-full min-w-44 bg-white border border-slate-200 py-1.5 rounded shadow-lg overflow-hidden mt-1" :class="align === 'right' ? 'right-0' : 'left-0'">
         <div class="pt-0.5 pb-2 px-3 mb-1 border-b border-slate-200">
-          <div class="font-medium text-slate-800">Andres</div>
-          <div class="text-xs text-slate-500 italic">Director</div>
+          <div class="font-medium text-slate-800">{{user?.name}}</div>
+          <div class="text-xs text-slate-500 italic">{{user?.role}}</div>
         </div>
         <ul
           ref="dropdown"
@@ -47,19 +47,22 @@
 
 <script>
 import { ref, onMounted, onUnmounted } from 'vue'
-import UserAvatar from '../images/user-avatar-32.png'
+import DefaultImage from '../images/user-avatar-80.png'
+import useResources from '../composables/useResources'
+
 
 export default {
   name: 'DropdownProfile',
-  props: ['align'],
+  props: ['align','user'],
   data() {
     return {
-      UserAvatar: UserAvatar,
+      DefaultImage: DefaultImage,
       companyOne: this.companyOne
     }
   },  
   setup() {
-
+    const previewImage = ref(DefaultImage);
+    const {getImage} = useResources()
     const dropdownOpen = ref(false)
     const trigger = ref(null)
     const dropdown = ref(null)
@@ -86,10 +89,14 @@ export default {
       document.removeEventListener('keydown', keyHandler)
     })
 
+    
+
     return {
       dropdownOpen,
       trigger,
       dropdown,
+      getImage,
+      previewImage
     }
   }
 }

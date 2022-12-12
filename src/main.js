@@ -10,6 +10,7 @@ const app = createApp(App)
 
 app.config.globalProperties.companyOne = 'Consulting';
 app.config.globalProperties.companyTwo = 'Lexi';
+app.config.globalProperties.document = document;
 app.use(pinia)
 app.use(router)
 app.mount('#app')

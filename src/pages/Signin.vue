@@ -38,31 +38,31 @@
               <div class="space-y-4">
                 <div>
                   <label class="block text-sm font-medium mb-1" for="email">Correo</label>
-                  <input id="email" class="form-input w-full" type="email" />
+                  <input id="email" class="form-input w-full" type="email" v-model="loginForm.email"/>
                 </div>
                 <div>
                   <label class="block text-sm font-medium mb-1" for="password">Contraseña</label>
-                  <input id="password" class="form-input w-full" type="password" autoComplete="on" />
+                  <input id="password" class="form-input w-full" type="password" autoComplete="on" v-model="loginForm.password"/>
                 </div>
               </div>
               <div class="flex items-center justify-between mt-6">
                 <div class="mr-1">
                   <router-link class="text-sm underline hover:no-underline" to="/reset-password">¿Olvidaste tu contraseña?</router-link>
                 </div>
-                <router-link class="btn bg-indigo-500 hover:bg-indigo-600 text-white ml-3" to="/">Acceder</router-link>
+                <span class="btn bg-indigo-500 cursor-pointer hover:bg-indigo-600 text-white ml-3" @click="sendLoginForm">Acceder</span>
               </div>
             </form>
             <!-- Footer -->
             <div class="pt-5 mt-6 border-t border-slate-200">
             
               <!-- Warning -->
-              <div class="mt-5">
-                <div class="bg-amber-100 text-amber-600 px-3 py-2 rounded">
+              <div class="mt-5 ">
+                <div v-if="error" class="bg-amber-100 text-amber-600 px-3 py-2 rounded">
                   <svg class="inline w-3 h-3 shrink-0 fill-current mr-2" viewBox="0 0 12 12">
                     <path d="M10.28 1.28L3.989 7.575 1.695 5.28A1 1 0 00.28 6.695l3 3a1 1 0 001.414 0l7-7A1 1 0 0010.28 1.28z" />
                   </svg>
                   <span class="text-sm">
-                    Este es un ejemplo de alerta. Ej: La contraseña es incorrecta.
+                    {{error.message}}
                   </span>
                 </div>
               </div>
@@ -83,9 +83,24 @@
   </main>
 </template>
 
-<script>
+<script setup>
+import useAuth from '../composables/useAuth';
+import { useRouter } from 'vue-router';
+import {ref} from 'vue';
 
-export default {
-  name: 'Signin',
+const router = useRouter();
+const  { login, loading, error,user } = useAuth() 
+const loginForm = ref({
+  email:'',
+  password:''
+})
+
+const sendLoginForm = async () => {
+  await login(loginForm.value);
+  if(user.value)
+  {
+    router.push('/');
+  }
 }
+
 </script>

@@ -76,10 +76,12 @@
           <div class="space-y-2 grid grid-cols-1 sm:grid-cols-2 gap-4">
             
             <div class="flex justify-center sm:col-span-2">
-             
+              <input id="image-input-create" class="hidden" accept="image/jpeg, image/png, image/jpg" type="file" @change="uploadImage">
+          
               <img
+                @click="clickInput"
                 class="rounded-full cursor-pointer hover:grayscale ease-in-out duration-300 active:grayscale-0"
-                :src="'../src/images/user-64-01.jpg'"
+                :src="`${previewImage}`"
                 width="64"
                 height="64"
                 :alt="'Foto de perfil'"
@@ -88,7 +90,7 @@
             <!-- Start -->
             <div>
               <label class="block text-sm font-medium mb-1 mt-2" for="name-create"
-                >Nombre y Apellido</label
+                >Nombre</label
               >
               <input id="name-create" class="form-input w-full" type="text" v-model="newUser.name"/>
             </div>
@@ -150,7 +152,7 @@
           >
             Cancelar
           </button>
-          <button :disabled="loading" @click="createNewUser(newUser)" class="btn-sm disabled:bg-indigo-300 bg-indigo-500 hover:bg-indigo-600 text-white">
+          <button :disabled="loading" @click="createNewUser()" class="btn-sm disabled:bg-indigo-300 bg-indigo-500 hover:bg-indigo-600 text-white">
             Guardar
           </button>
         </div>
@@ -165,6 +167,7 @@ import { onMounted, ref } from 'vue'
 import Sidebar from '../../partials/Sidebar.vue'
 import useRooms from "../../composables/useRooms";
 import useUsers from "../../composables/useUsers";
+import useAdmins from "../../composables/useAdmins";
 import Header from '../../partials/Header.vue'
 import ModalBasic from '../../components/ModalBasic.vue';
 import DeleteButton from '../../partials/actions/DeleteButton.vue'
@@ -173,12 +176,23 @@ import FilterButton from '../../components/DropdownFilter.vue'
 import CustomersTable from '../../partials/customers/CustomersTable.vue'
 import Toast from '../../components/Toast.vue'
 import PaginationClassic from '../../components/PaginationClassic.vue'
-  
+
+
+import DefaultImage from '../../images/user-avatar-80.png'
+import useAuth from '../../composables/useAuth'
+import { useRouter, useRoute } from 'vue-router'
+import useResources from '../../composables/useResources'
+const previewImage = ref(DefaultImage);
+const {getImage} = useResources()
+const router = useRouter();
+const route = useRoute();
+
 const sidebarOpen = ref(false)
 const confirmation = ref('')
 const succestoast = ref(false);    
 const registerModalOpen = ref(false)
-const { users,results, error, initializeClients, loading, createUser,newUserId } = useUsers();
+const { users,results, error, initializeClients, loading,newUserId } = useUsers();
+const { createUser } = useAdmins();
 const { rooms, initializeRooms, updateRoom } = useRooms();
 const newUser = ref({
     name: '',
@@ -199,32 +213,50 @@ function resetData() {
       password: '',            
       phoneNumber: '',
       role: 'user',
+      room: ''
     }
     confirmation.value = ''
   }
 }
 
-const createNewUser = async (user) => {
+const createNewUser = async () => {
   
-  await createUser(user);
+  let response = await createUser(newUser?.value);
   registerModalOpen.value=false; 
-  
-  if(user.room) {
-    let resultRoom = rooms.value.reduce((prevRoom)=>{
-      if(prevRoom.id == user.room)
-      return prevRoom;
-    });
-    let usersList = [...resultRoom.users];
-    usersList.push(newUserId.value);
-    
-    updateRoom({users: usersList},resultRoom.id);
-  }
+ 
+  //if(newUser.value.room) {
+    //let resultRoom = rooms.value.find((prevRoom)=>prevRoom.id == newUser.value.room);
+    //if(resultRoom) {
+      //let usersList = [...resultRoom.users];
+      //usersList.push(response?.data.id);
+      
+      //await updateRoom({users: usersList},resultRoom.id);
+  //Bug, proponer actualizar el modelo de Room desde el backend
+    //}
+   // }
 
   resetData();
-  succestoast.value=true
+  succestoast.value=true;
+  router.push(route.path);
 }
 
 
+const clickInput = () => {
+  const input = document.querySelector('#image-input-create')
+  input.click();
+}
+
+const uploadImage = (e) => {
+  const image = e.target.files[0];
+  newUser.value.file = e.target.files[0];
+
+  const reader = new FileReader();
+  reader.readAsDataURL(image);
+  reader.onload = e =>{
+  previewImage.value = e.target.result;
+  ;
+  };
+}
 
  
   initializeClients();

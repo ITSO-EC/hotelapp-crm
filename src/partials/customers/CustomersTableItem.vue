@@ -65,36 +65,47 @@
         <div class="text-sm">
          
           <div class="space-y-2 grid grid-cols-1 sm:grid-cols-2 gap-4">
-            
+            <div class="flex justify-center sm:col-span-2">
+              <input :id="`image-input-edit-${customer.id}`" class="hidden" accept="image/jpeg, image/png, image/jpg" type="file" @change="uploadImage">
+          
+              <img
+                @click="clickInput"
+                class="rounded-full cursor-pointer hover:grayscale ease-in-out duration-300 active:grayscale-0"
+                :src="customer.profileImageUrl? `${getImage(customer.profileImageUrl)}`: `${previewImage}`"
+                width="64"
+                height="64"
+                :alt="'Foto de perfil'"
+              />
+            </div>
             <!-- Start -->
             <div class="mt-2">
               <label class="block text-sm font-medium mb-1 " :for="`name-${customer.id}`"
-                >Nombre Completo</label
+                >Nombre</label
               >
-              <input :id="`name-${customer.id}`" class="form-input w-full" type="text" v-model="customer.name" />
+              <input :id="`name-${customer.id}`" class="form-input w-full" type="text" v-model="newUser.name" />
             </div>
             <!-- Start -->
             <div>
               <label class="block text-sm font-medium mb-1 " :for="`email-${customer.id}`"
                 >Correo</label
               >
-              <input :id="`email-${customer.id}`" class="form-input w-full" type="text" v-model="customer.email" />
+              <input :id="`email-${customer.id}`" class="form-input w-full" type="text" v-model="newUser.email" />
             </div>
             <!-- Start -->
             <div>
               <label class="block text-sm font-medium mb-1 " :for="`cellphone-${customer.id}`"
                 >Celular</label
               >
-              <input :id="`cellphone-${customer.id}`" class="form-input w-full" type="text" v-model="customer.phone_number" />
+              <input :id="`cellphone-${customer.id}`" class="form-input w-full" type="text" v-model="newUser.phoneNumber" />
             </div>
             <!-- select -->
-            <div v-if="customer.role =='member' || customer.role=='user'">
-              <label class="block text-sm font-medium mb-1" :for="`role-${customer.id}`" 
-                >Rol {{customer.role}}</label
+            <div v-if="rooms">
+              <label class="block text-sm font-medium mb-1" :for="`room-${customer.id}`" 
+                >Habitación</label
               >
-              <select :id="`role-${customer.id}`" class="w-full form-select" v-model="customer.role">
-                <option value="user">Usuario</option>
-                <option value="member">Miembro</option>
+              <select :id="`room-${customer.id}`" class="w-full form-select" v-model="newUser.room">
+                <option v-for="room in rooms" :key="`room-${room?.id}`" :value="room.id">{{room?.number}}</option>
+                
               
               </select>
             </div>
@@ -190,29 +201,42 @@
 </template>
 
 <script setup>
-import useOrders from '../../composables/useOrders';
 import useUsers from '../../composables/useUsers';
+import useAuth from '../../composables/useAuth';
 import EditMenu from "../../components/DropdownEditMenu.vue";
 import { defineProps, onMounted,ref } from 'vue';
 
 import ModalBasic from "../../components/ModalBasic.vue";
 import ModalBlank from '../../components/ModalBlank.vue'
 
-const {orders, retrieveOrdersByUser} = useOrders();
-const { editUser, deleteUser } = useUsers();
+//Usado para el input de imagenes
+import DefaultImage from '../../images/user-avatar-80.png'
+import { useRouter, useRoute } from 'vue-router'
+import useResources from '../../composables/useResources'
+import useRooms from '../../composables/useRooms'
+const previewImage = ref(DefaultImage);
+const {getImage} = useResources()
+const router = useRouter();
+const route = useRoute();
+////
+const {  deleteUser,initializeClients } = useUsers();
+const { editUser } = useAuth();
 const props = defineProps(['customer', 'value', 'selected'])
-
+const { rooms, initializeRooms, updateRoom } = useRooms();
 const basicModalOpen = ref(false);
 const dangerModalOpen = ref(false);
 
 const newUser = ref({
-  name: null,
-  email: null,
-  role: null,
-  phone_number: null,
+  name: props.customer?.name,
+  email: props.customer?.email,
+  room: props.customer?.room?.id,
+  phoneNumber: props.customer?.phoneNumber,
   // notificationApp: props.customer.notificationApp,
   // notificationEmail: props.customer.notificationEmail,
   // notificationWhatsapp: props.customer.notificationWhatsapp,
+})
+const displayRoom = ref({
+  number: props.customer?.room
 })
 
 const convertDate = (date) => {
@@ -231,26 +255,47 @@ const convertDate = (date) => {
 const emits = defineEmits(['edit-customer'])
 
 
-function getRole(role) {
-  switch(role) {
-    case 'admin':
-      return "Admin";
-    case 'user':
-      return "Huesped";
-    default:
-      return "Unknown";
-  }
-}
 
-const editUserLocal = () => {
-  if (!newUser.value.name) newUser.value.name = props.customer.name;
-  if (!newUser.value.email) newUser.value.email = props.customer.email;
-  if (!newUser.value.role) newUser.value.role = props.customer.role;
-  if (!newUser.value.phone_number) newUser.value.phone_number = props.customer.phone_number;
+const editUserLocal = async () => {
+  if(!rooms.value) await initializeRooms();
 
-  editUser(newUser.value, props.customer.id);
+  await editUser(newUser.value, props?.customer?.id)
+  if(newUser.value.room) {
+      let resultRoom = rooms.value.find((roomsel)=>roomsel.id == newUser.value.room);
+      if(resultRoom)
+      {
+        let usersList = [...resultRoom.users];
+        usersList.push(props?.customer?.id);
+        
+        await updateRoom({users: usersList},resultRoom.id);
+    
+      }
+      }
+  
   basicModalOpen.value = false;
   emits('edit-customer');
+  await initializeClients();
 
 }
+
+
+const clickInput = () => {
+  const input = document.querySelector(`#image-input-edit-${props.customer.id}`)
+  console.log(props.customer.id)
+  input.click();
+}
+
+const uploadImage = (e) => {
+  const image = e.target.files[0];
+  newUser.value.file = e.target.files[0];
+  props.customer.profileImageUrl = null;
+
+  const reader = new FileReader();
+  reader.readAsDataURL(image);
+  reader.onload = e =>{
+  previewImage.value = e.target.result;
+  ;
+  };
+}
+
 </script>

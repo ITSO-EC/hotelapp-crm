@@ -6,6 +6,7 @@ export interface User {
     phoneNumber: string,
     room?: string,
     password?:string,
+    file?: string[],
     imageUrl?: string[],
     isEmailVerified?: boolean,
     allowPushNotifications?: boolean,

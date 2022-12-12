@@ -6,7 +6,12 @@
 
     <!-- Content area -->
     <div class="relative flex flex-col flex-1 overflow-y-auto overflow-x-hidden">
-      
+      <Toast :type="'error'" :open="error?.response" @close-toast="error=null; error1=null; succestoast = false" 
+      class="fixed z-40 mt-16 w-1/3">{{error?.response?.data != null? error.response?.data?.message :''}}</Toast>
+
+      <Toast :type="'success'" :open="!error && succestoast && !loading" 
+      @close-toast="succestoast=false" class="fixed z-40 mt-16 w-1/3">
+      Órden creada exitosamente.</Toast>
       <!-- Site header -->
       <Header :sidebarOpen="sidebarOpen" @toggle-sidebar="sidebarOpen = !sidebarOpen" />
       <Toast :type="'error'" :open="error" @close-toast="error=null; succestoast = false" class="fixed z-40 mt-16 w-1/3">{{error}}</Toast>
@@ -82,10 +87,12 @@
           <div class="space-y-2 grid grid-cols-1 sm:grid-cols-2 gap-4">
             
             <div class="flex justify-center sm:col-span-2">
-             
+              <input id="image-input" class="hidden" accept="image/jpeg, image/png, image/jpg" type="file" @change="uploadImage">
+          
               <img
+              @click="clickInput"
                 class="rounded-full cursor-pointer hover:grayscale ease-in-out duration-300 active:grayscale-0"
-                :src="'../src/images/user-64-01.jpg'"
+                :src="`${previewImage}`"
                 width="64"
                 height="64"
                 :alt="'Foto de perfil'"
@@ -156,7 +163,7 @@
           >
             Cancelar
           </button>
-          <button :disabled="loading" @click="createUser(newUser);registerModalOpen=false; successtoast=true" class="btn-sm disabled:bg-indigo-300 bg-indigo-500 hover:bg-indigo-600 text-white">
+          <button :disabled="loading" @click="createNewUser()" class="btn-sm disabled:bg-indigo-300 bg-indigo-500 hover:bg-indigo-600 text-white">
             Guardar
           </button>
         </div>
@@ -174,14 +181,22 @@ import PaginationNumeric from '../../components/PaginationNumeric.vue'
 import ModalBasic from '../../components/ModalBasic.vue'
 import useUsers from '../../composables/useAdmins'
 import Toast from '../../components/Toast.vue'
-import Image01 from '../../images/user-64-01.jpg'
 
+import DefaultImage from '../../images/user-avatar-80.png'
+import useAuth from '../../composables/useAuth'
+import { useRouter, useRoute } from 'vue-router'
+import useResources from '../../composables/useResources'
+const previewImage = ref(DefaultImage);
+const {getImage} = useResources()
+const router = useRouter();
+const route = useRoute();
 
-const  { initializeAdmins, createUser, loading, users, results, error ,page ,pages } = useUsers() 
+const  { initializeAdmins, createUser, loading, users, error,results,page ,pages } = useUsers() 
 const sidebarOpen = ref(false)
 const confirmation = ref('')
 const succestoast = ref(false);    
 const registerModalOpen = ref(false)
+
 
 const newUser = ref({
   name: '',
@@ -196,9 +211,34 @@ function resetData() {
     email: '',
     password: '',            
     phoneNumber: '',
-    role: '',
+    role: 'admin',
   }
   confirmation.value = ''
+}
+
+const createNewUser = async() => {
+  
+  await createUser(newUser?.value);
+  registerModalOpen.value=false; 
+  succestoast.value=true
+  router.push(route.path)
+}
+
+const clickInput = () => {
+  const input = document.querySelector('#image-input')
+  input.click();
+}
+
+const uploadImage = (e) => {
+  const image = e.target.files[0];
+  newUser.value.file = e.target.files[0];
+
+  const reader = new FileReader();
+  reader.readAsDataURL(image);
+  reader.onload = e =>{
+  previewImage.value = e.target.result;
+  ;
+  };
 }
 
 

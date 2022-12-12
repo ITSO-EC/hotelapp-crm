@@ -25,16 +25,45 @@ const useAdmins = () => {
     const selectUserById = (id: string) => adminsStore.getUserById(id);
 
     const retrieveUserById = (id: string) => {
-      const selectedUserx = users.value?.find((user) => user.id == id);
+      const selectedUserx = users?.value?.find((user) => user.id == id);
       return selectedUserx;
     }
 
     const createUser = async(payload:User) => {
         loading.value = true;
+        
         try {
-          await axios.post(BASE_API+'users', payload);
-          loading.value = false;
-          initializeAdmins()
+
+          if(!payload.file) {
+              
+            await axios.post(BASE_API+'users', payload, 
+            {
+              headers:{
+                'Content-Type': 'application/json'
+              }
+            });
+            await initializeAdmins();
+            loading.value = false;
+          }
+          else {
+            let response = await axios.post(BASE_API+'users', payload, 
+            {
+              headers:{
+                'Content-Type': 'multipart/form-data'
+              }
+            });
+            let userImages = response?.data.imageUrl;
+            let response2 = await axios.patch(BASE_API+'users/'+response?.data.id, {profileImageUrl: userImages[userImages.length - 1]} ,
+            {
+              headers: {
+                'Content-Type' : 'application/json'
+              }
+            })
+            await initializeAdmins();
+            loading.value = false;
+          }
+
+          
         } catch (err) {
           error.value = err.response.data.message;
           loading.value=false;
@@ -45,19 +74,44 @@ const useAdmins = () => {
 
       const editUser = async(payload:User, id:string) => {
         loading.value = true;
+        
         try {
-          await axios.patch(BASE_API+'users/'+id, payload)
-          loading.value = false;
-          initializeAdmins();
+          if(payload.file){
+            let response = await axios.patch(BASE_API+'users/addImages/'+id, payload,
+            {
+              headers: {
+                'Content-Type' : 'multipart/form-data'
+              }
+            })
+            let userImages = response?.data.imageUrl;
+            let response2 = await axios.patch(BASE_API+'users/'+id, {profileImageUrl: userImages[userImages.length - 1]} ,
+            {
+              headers: {
+                'Content-Type' : 'application/json'
+              }
+            })
+            adminsStore.loadAdmins(response2?.data)
+            loading.value = false;
+          }
+          else{
+            let response = await axios.patch(BASE_API+'users/'+id, payload,
+            {
+              headers: {
+                'Content-Type' : 'application/json'
+              }
+            })
+            adminsStore.loadAdmins(response?.data)
+            loading.value = false;
+          }
+         
+          
         }
         catch(err) {
           error.value = err.response.data.message;
           loading.value = false;
           
-          initializeAdmins()
-        }
-       };
-  
+          }
+    };
       const deleteUser = async(id:string) => {
         loading.value = true;
         axios.delete(BASE_API+'users/'+id)

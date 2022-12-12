@@ -5,6 +5,7 @@ import Orders from './pages/ecommerce/Orders.vue'
 import Customers from './pages/ecommerce/Customers.vue'
 import RooftopOrders from './pages/ecommerce/RooftopOrders.vue'
 import Shop from './pages/ecommerce/Shop.vue'
+import axios from "axios";
 
 import UsersTabs from './pages/community/UsersTabs.vue'
 
@@ -16,12 +17,13 @@ import Changelog from './pages/utility/Changelog.vue'
 import EmptyState from './pages/utility/EmptyState.vue'
 import PageNotFound from './pages/utility/PageNotFound.vue'
 import KnowledgeBase from './pages/utility/KnowledgeBase.vue'
-
+import Cookies from 'js-cookie'
 import Signin from './pages/Signin.vue'
-import Signup from './pages/Signup.vue'
 import ResetPassword from './pages/ResetPassword.vue'
 
+import {useAuthStore} from './stores/authStore'
 const routerHistory = createWebHistory()
+const BASE_API='https://hotelapp.fastery.dev/v1/'
 
 const router = createRouter({
   history: routerHistory,
@@ -62,13 +64,9 @@ const router = createRouter({
 
     //Auth Related
     {
+      name: 'Login',
       path: '/signin',
       component: Signin
-    },
-    {
-      path: '/signup',
-      component: Signup,
-      name:'Signup'
     },
     {
       path: '/reset-password',
@@ -108,6 +106,30 @@ const router = createRouter({
       component: PageNotFound
     }
   ]
+})
+
+router.beforeEach(async (to,from)=>{  
+  const authStore = useAuthStore();
+  if(to.name !== 'Login' && !authStore.user) {
+    let uid = Cookies.get('user_id');
+    let at = Cookies.get('access_token');
+    if(uid && at)
+    {
+      let response = await axios.get(BASE_API+'/users/'+uid)
+      authStore.loadUser(response.data)
+      console.log(await response);
+      
+    }
+    else {  
+      return {name : 'Login'}
+    }
+      
+    
+    
+
+    
+  }
+  
 })
 
 export default router

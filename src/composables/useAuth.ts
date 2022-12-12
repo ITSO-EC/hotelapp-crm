@@ -1,49 +1,122 @@
+import axios from "axios";
 import { storeToRefs } from "pinia";
-import { useAuthStore } from "~~/stores/authStore";
+import { User } from "../interfaces/user";
+import {useRoute} from 'vue-router';
+import { useAuthStore } from "../stores/authStore";
+import Cookies from 'js-cookie'
 
-const AUTH_API = 'https://auth.itso.ga/v1/auth/'
+const AUTH_API='https://hotelapp.fastery.dev/v1/auth/'
+const BASE_API='https://hotelapp.fastery.dev/v1/'
 
-export default async function registerWithEmail( name:string, email:string ,password: string, phone_number: string) {
-
+const useAuth = () => {
+  
+  
     const authStore = useAuthStore();
-    const {user} = storeToRefs(authStore);
-    try {
-        const res = await $fetch(AUTH_API+'register', {
-            method: 'POST',
-            headers:{'Content-type': 'application/json'},
-            body: {name, email, password, phone_number}
-        }
-        );
-
-        if(res) {
-            const authStore = useAuthStore();
-            user.value = res;
-            console.log(authStore.user);
-            await useRouter().push('/login')
-        }
-
-    } catch (error) {
-        console.log('error: '+ error.toString());
+    
+    
+    const { user, error, loading } = storeToRefs(authStore);
+    
+    const initializeAuth = async () => {
+      loading.value = true;
+      let uid = Cookies.get('user_id');
+      let at = Cookies.get('access_token');
+      if(uid && at)
+      {
+        let response = await axios.get(BASE_API+'/users/'+uid)
+        authStore.loadUser(response.data)
+       
+      }
+      loading.value = false;
     }
-}
-export async function login (email:string, password:string) {
-    const authStore = useAuthStore();
-    const {user} = storeToRefs(authStore);
-    try {
-        const res = await $fetch(AUTH_API+'login', {
-            method: 'POST',
-            headers:{'Content-type': 'application/json'},
-            credentials: 'include',
-            body: { email, password }
-        });
-        if(res) {
+
+    const editUser = async(payload:User, id:string) => {
+        loading.value = true;
+        try {
+          if(payload.file){
+            let response = await axios.patch(BASE_API+'users/addImages/'+id, payload,
+            {
+              headers: {
+                'Content-Type' : 'multipart/form-data'
+              }
+            })
+            let userImages = response?.data.imageUrl;
+            let response2 = await axios.patch(BASE_API+'users/'+id, {profileImageUrl: userImages[userImages.length - 1]} ,
+            {
+              headers: {
+                'Content-Type' : 'application/json'
+              }
+            })
+            await initializeAuth();
+            loading.value = false;
+          }
+          else{
+            let response = await axios.patch(BASE_API+'users/'+id, payload,
+            {
+              headers: {
+                'Content-Type' : 'application/json'
+              }
+            })
+          
+            loading.value = false;
+          }
+         
+          
+        }
+        catch(err) {
+          error.value = err.response.data.message;
+          loading.value = false;
+          
+          }
+    };
+
+    const login = async(payload:User) => {
+        loading.value = true;
+        try {
+          const response = await axios.post(AUTH_API+'login', payload);
+          authStore.loadUser(response?.data?.user);
+
+          if(response.status == 200){
+            let d = new Date(response?.data.tokens.access.expires)
+            let e = new Date(response?.data.tokens.refresh.expires)
+            document.cookie ="access_token=" + response?.data?.tokens?.access.token + ";" + "expires=" + d.toUTCString() + ";path=/";
+            document.cookie ="user_id=" + response?.data?.user?.id + ";" + "expires=" + d.toUTCString() + ";path=/";
            
-            user.value = res;
-            console.log(authStore.user);
-            await useRouter().push('/')
+            document.cookie ="refresh_token=" + response?.data?.tokens?.refresh.token + ";" + "expires=" + e.toUTCString() + ";path=/";
+          }
+         
+          loading.value = false;
+          initializeAuth();
         }
+        catch(err) {
+          console.log(err);
+          error.value = err.response.data;
+          loading.value = false;
+        }
+     };
 
-    } catch (error) {
-        console.log('error: '+ error.toString());
+    const isLoggedIn = () => {
+     return false;
+      
+    }
+
+    const logout = async () => {
+      authStore.loadUser(undefined);
+      Cookies.remove('user_id')
+
+    }
+  
+  
+    return {
+        // Properties
+        user,
+        error,
+        loading,
+        
+        //methods
+        login,
+        isLoggedIn,
+        editUser,
+        initializeAuth,
     }
 }
+export default useAuth;

@@ -13,7 +13,7 @@ const useUsers = () => {
 
     const initializeUsers = async (page:number=1) => {
         loading.value = true;
-        usersStore?.loadUsers(await axios.get(BASE_API+'users?page='+page));
+        usersStore?.loadUsers(await axios.get(BASE_API+'users?populate=room&role=user&page='+page));
         loading.value = false;
     }
 

@@ -31,21 +31,7 @@
                 >Editar perfil</router-link
               >
             </li>
-            <li>
-              <router-link
-                class="
-                  font-medium
-                  text-sm text-slate-600
-                  hover:text-slate-800
-                  flex
-                  py-1
-                  px-3
-                "
-                to="#0"
-                @click.stop="roleModalOpen = true"
-                >Editar Rol</router-link
-              >
-            </li>
+         
             <li>
               <router-link
                 class="
@@ -66,19 +52,18 @@
         <!-- Image + name -->
         <header>
           <div class="flex justify-center mb-2">
-            <router-link
-              class="relative inline-flex items-start"
-              :to="'#'"
+            <div              
+            class="relative inline-flex items-start"
             >
             
               <img
-                class="rounded-full"
-                :src="Image01"
+                class="rounded-full w-[64px] h-[64px] object-cover"
+                :src="`${itemRef.profileImageUrl ? getImage(itemRef.profileImageUrl): previewImage}`"
                 width="64"
                 height="64"
                 :alt="item.name"
               />
-            </router-link>
+            </div>
           </div>
           <div class="text-center">
             <router-link
@@ -119,10 +104,12 @@
           <div class="space-y-2 grid grid-cols-1 sm:grid-cols-2 gap-4">
             
             <div class="flex justify-center sm:col-span-2">
-             
+              <input :id="`image-input-${item.id}`" class="hidden" accept="image/jpeg, image/png, image/jpg" type="file" @change="uploadImage">
+              
               <img
-                class="rounded-full cursor-pointer hover:grayscale ease-in-out duration-300 active:grayscale-0"
-                :src="Image01"
+                class="rounded-full cursor-pointer hover:grayscale ease-in-out duration-300 active:grayscale-0 w-[64px] h-[64px] object-cover"
+                :src="`${itemRef.profileImageUrl ? getImage(itemRef.profileImageUrl): previewImage}`"
+                @click.stop="clickInput()"
                 width="64"
                 height="64"
                 :alt="item.name"
@@ -131,7 +118,7 @@
             <!-- Start -->
             <div>
               <label class="block text-sm font-medium mb-1 " :for="`name-${item.id}`"
-                >Nombre y Apellido</label
+                >Nombre</label
               >
               <input :id="`name-${item.id}`" class="form-input w-full" type="text" v-model="itemRef.name" />
             </div>
@@ -180,7 +167,7 @@
             Cancelar
           </button>
           <button 
-          @click="editUser(itemRef, item.id)"
+          @click="updateUser"
           class="btn-sm bg-indigo-500 hover:bg-indigo-600 text-white">
             Guardar
           </button>
@@ -262,18 +249,60 @@ import { ref } from "vue";
 import EditMenu from "../../components/DropdownEditMenu.vue";
 import ModalBasic from "../../components/ModalBasic.vue";
 import ModalBlank from '../../components/ModalBlank.vue'
-
-import Image01 from '../../images/user-64-01.jpg'
+import {useRouter,useRoute} from 'vue-router';
+import DefaultImage from '../../images/user-avatar-80.png'
+import useResources from '../../composables/useResources'
 import useUsers from "../../composables/useUsers";
+import useAuth from "../../composables/useAuth";
 const basicModalOpen = ref(false);
 const roleModalOpen = ref(false);
 const dangerModalOpen = ref(false);
 
-const {deleteUser, editUser} = useUsers();
+const previewImage = ref(DefaultImage);
+
+const router = useRouter();
+const route = useRoute();
+const {getImage} = useResources()
+const {deleteUser} = useUsers();
+const { editUser} = useAuth();
 const props = defineProps(['item']);
 const itemRef = ref({
   name:props.item.name,
   email:props.item.email,
-  phoneNumber: props.item.phoneNumber
+  phoneNumber: props.item.phoneNumber,
+  profileImageUrl: props?.item?.profileImageUrl || '',
+  imageUrl : props?.item?.imageUrl || []
 });
+
+const newUser = ref({
+  
+})
+
+const clickInput = () => {
+  let input = document.querySelector(`#image-input-${props.item.id}`)
+  input.click();
+}
+
+const updateUser = async() => {
+  console.log(newUser.value.file)
+  newUser.value.name = itemRef.value.name
+  newUser.value.email = itemRef.value.email
+  newUser.value.phoneNumber = itemRef.value.phoneNumber
+  await editUser(newUser?.value, props?.item?.id);
+  router.push(route.path)
+}
+
+const uploadImage = (e) => {
+  const image = e.target.files[0];
+  
+  newUser.value.file = e.target.files[0]
+  console.log(newUser?.value.file)
+  itemRef.value.profileImageUrl = null;
+
+  const reader = new FileReader();
+  reader.readAsDataURL(image);
+  reader.onload = e =>{
+  previewImage.value = e.target.result;
+  };
+}
 </script>

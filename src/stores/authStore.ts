@@ -1,43 +1,43 @@
 import { defineStore, acceptHMRUpdate } from 'pinia';
 import { User } from '../interfaces/user'
-
+interface AuthState {
+    user?: User;
+    loading: boolean;
+    error: String;
+    }
 export const useAuthStore = defineStore({
     id: 'auth',
-    state: () => ({
-        user: null,
+    state: (): AuthState => ({
+        user: undefined ,
+        error: '',
+        loading: false,
     }),
 
     getters: {
-        isLoggedIn: (state) => !!state.user
     },
 
     actions: {
-        async initAuth() {
-            let user = this.user
-
-            if (!user) {
-                //const response = await $fetch('/api/user')
-                //user = response.user
+        loadUser(data) {
+            try 
+            {
+                this.loading = true;
+                  this.user = data; 
+                  
+                this.loading = false;
+                
+            } 
+            catch (error) 
+            {
+                this.error = error;
+                console.error(error);
             }
-
-            this.updateUser(user)
-        },
-
-        async login (payload) {
-            // some login logic
-        },
-
-        async register (payload) {
-            // some register logic
-        },
+             
+         },
+  
 
         async logOut() {
-            this.updateUser(null)
+            this.user = undefined
         },
-
-        updateUser(payload) {
-            this.user = payload
-        }
 
     },
 })

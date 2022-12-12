@@ -35,28 +35,13 @@
   </div>
 </template>
 
-<script>
+<script setup>
 import { ref } from 'vue'
 import Sidebar from '../../partials/Sidebar.vue'
 import Header from '../../partials/Header.vue'
 import SettingsSidebar from '../../partials/settings/SettingsSidebar.vue'
 import AccountPanel from '../../partials/settings/AccountPanel.vue'
 
-export default {
-  name: 'Account',
-  components: {
-    Sidebar,
-    Header,
-    SettingsSidebar,
-    AccountPanel,
-  },
-  setup() {
+const sidebarOpen = ref(false);
 
-    const sidebarOpen = ref(false)
-
-    return {
-      sidebarOpen,
-    }  
-  }
-}
 </script>

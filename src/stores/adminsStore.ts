@@ -2,7 +2,7 @@ import { defineStore, acceptHMRUpdate } from 'pinia';
 import { User } from '../interfaces/user';
 
 interface AdminsState {
-    users: User[];
+    users?: User[];
     selectedUser: {};
     loading: boolean;
     error: String;
