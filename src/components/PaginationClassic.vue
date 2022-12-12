@@ -31,9 +31,7 @@
   import { defineProps, onMounted, ref } from 'vue';
   import useOrders from '../composables/useOrders';
   import useUsers from '../composables/useUsers';
-  import useCategories from '../composables/useCategories';
   import useItems from '../composables/useItems';
-  import useQueryPosts from '../composables/useQueryPosts';
   const props = defineProps(['items','results', 'type'])
 
   const localpage = ref(1);
@@ -76,54 +74,6 @@
       
       return;
     }  
-    if (props.type == 'posts')
-    {    
-      const {posts,loading, pages,page,nextPage} = useQueryPosts();
-      if(page.value < pages.value) 
-      {
-        
-        availableprev.value = true;
-        localpage.value = page.value + 1;
-        nextPage(page.value, posts.value[0].category);
-        if(localpage.value+1 > pages.value){ 
-          availablenext.value=false;
-        }
-      }
-      
-      return;
-    }
-    if (props.type == 'categories')
-    {    
-      const {categories,loading, pages,page,nextPage} = useCategories();
-      if(page.value < pages.value) 
-      {
-        
-        availableprev.value = true;
-        localpage.value = page.value + 1;
-        nextPage(categories.value[0].page ,page.value);
-        if(localpage.value+1 > pages.value){ 
-          availablenext.value=false;
-        }
-      }
-      
-      return;
-    }  
-    if (props.type == 'views')
-    {    
-      const {loading, pages,page,nextPage} = useItems();
-      console.log('page', page.value, 'pages', pages.value)
-      if(page.value < pages.value) 
-      {
-        
-        availableprev.value = true;
-        localpage.value = page.value + 1;
-        nextPage(page.value);
-        if(localpage.value+1 > pages.value){ 
-          availablenext.value=false;
-        }
-      }
-      return;
-    }
     
   }
   function prevPageLocal() {
@@ -158,50 +108,6 @@
       
       return;
     }  
-    if (props.type == 'posts')
-    {    
-      const {loading, page,prevPage} = useQueryPosts();
-      if(page.value > 1) 
-      {
-        availablenext.value = true;
-        localpage.value = page.value - 1;
-        prevPage(page.value, posts.value[0].category);
-        if(localpage.value-1 < 1){ 
-          availableprev.value=false;
-        }
-      }
-      
-      return;
-    }
-    if (props.type == 'categories')
-    {    
-      const {categories,loading, page,prevPage} = useCategories();
-      if(page.value > 1) 
-      {
-        availablenext.value = true;
-        localpage.value = page.value - 1;
-        prevPage(categories.value[0].page,page.value);
-        if(localpage.value-1 < 1){ 
-          availableprev.value=false;
-        }
-      }
-      
-      return;
-    }  
-    if (props.type == 'views')
-    {    
-      const {loading, page,prevPage} = useItems();
-      if(page.value > 1) 
-      {
-        availablenext.value = true;
-        localpage.value = page.value - 1;
-        prevPage(page.value);
-        if(localpage.value-1 < 1){ 
-          availableprev.value=false;
-        }
-      }
-      return;
-    }
     
   }
   onMounted(()=>{
@@ -209,7 +115,6 @@
       maxResults.value = 6
 
     }
-    console.log(props.type,props?.results)
     if(props?.results > maxResults.value) {
       availablenext.value = true;
     }

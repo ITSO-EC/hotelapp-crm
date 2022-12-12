@@ -42,7 +42,6 @@ import { ref } from 'vue'
 import Sidebar from '../partials/Sidebar.vue'
 import Header from '../partials/Header.vue'
 import WelcomeBanner from '../partials/dashboard/WelcomeBanner.vue'
-import DashboardAvatars from '../partials/dashboard/DashboardAvatars.vue'
 import FilterButton from '../components/DropdownFilter.vue'
 import Datepicker from '../components/Datepicker.vue'
 
@@ -53,16 +52,16 @@ import DashboardCard04 from '../partials/dashboard/DashboardCard04.vue'
 import DashboardCard10 from '../partials/dashboard/DashboardCard10.vue'
 
 
-import usersFactory from '../factories/userFactory'
-import itemsFactory from '../factories/itemFactory'
-import ordersFactory from '../factories/orderFactory'
-import roomsFactory from '../factories/roomFactory'
+//import usersFactory from '../factories/userFactory'
+//import itemsFactory from '../factories/itemFactory'
+//import ordersFactory from '../factories/orderFactory'
+//import roomsFactory from '../factories/roomFactory'
 
 const sidebarOpen = ref(false)
-const {generateUsers,initializeUsers,destroyUsers} = usersFactory();
-const {generateItems,initializeItems,destroyItems} = itemsFactory();
-const {generateOrders,initializeAllOrders,destroyOrders} = ordersFactory();
-const {generateRooms,initializeRooms,destroyRooms} = roomsFactory();
+//const {generateUsers,initializeUsers,destroyUsers} = usersFactory();
+//const {generateItems,initializeItems,destroyItems} = itemsFactory();
+//const {generateOrders,initializeAllOrders,destroyOrders} = ordersFactory();
+//const {generateRooms,initializeRooms,destroyRooms} = roomsFactory();
 
 
 //Genera Habs. / Borra Habs.

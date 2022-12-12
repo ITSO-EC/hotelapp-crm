@@ -82,7 +82,6 @@ const useOrders = () => {
           initializeAllOrders(page.value);
   
         } catch (error) {
-          console.error(error)
           
           error.value = error;
           loading.value = false;

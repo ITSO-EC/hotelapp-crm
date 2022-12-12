@@ -4,7 +4,6 @@ import Dashboard from './pages/Dashboard.vue'
 import Orders from './pages/ecommerce/Orders.vue'
 import Customers from './pages/ecommerce/Customers.vue'
 import RooftopOrders from './pages/ecommerce/RooftopOrders.vue'
-import Shop from './pages/ecommerce/Shop.vue'
 import axios from "axios";
 
 import UsersTabs from './pages/community/UsersTabs.vue'
@@ -13,10 +12,8 @@ import UsersTabs from './pages/community/UsersTabs.vue'
 import Account from './pages/settings/Account.vue'
 import Notifications from './pages/settings/Notifications.vue'
 
-import Changelog from './pages/utility/Changelog.vue'
 import EmptyState from './pages/utility/EmptyState.vue'
 import PageNotFound from './pages/utility/PageNotFound.vue'
-import KnowledgeBase from './pages/utility/KnowledgeBase.vue'
 import Cookies from 'js-cookie'
 import Signin from './pages/Signin.vue'
 import ResetPassword from './pages/ResetPassword.vue'
@@ -36,7 +33,7 @@ const router = createRouter({
     },
     
 
-    //FriendsHotel Related
+    //Friendstel Related
     {
       path: '/ecommerce/orders',
       component: Orders
@@ -49,12 +46,7 @@ const router = createRouter({
       path: '/ecommerce/customers',
       component: Customers
     },
-    {
-      path: '/ecommerce/shop',
-      component: Shop
-    },
-    
-
+   
     //Operadores
     {
       path: '/community/users-tabs',
@@ -84,24 +76,7 @@ const router = createRouter({
     },
 
     
-    {
-      path: '/utility/changelog',
-      component: Changelog
-    },
-    {
-      path: '/utility/empty-state',
-      component: EmptyState
-    },
-    {
-      path: '/utility/404',
-      component: PageNotFound
-    },
-    {
-      path: '/utility/knowledge-base',
-      component: KnowledgeBase
-    },
-   
-    {
+     {
       path: '/:pathMatch(.*)*',
       component: PageNotFound
     }
@@ -117,7 +92,6 @@ router.beforeEach(async (to,from)=>{
     {
       let response = await axios.get(BASE_API+'/users/'+uid)
       authStore.loadUser(response.data)
-      console.log(await response);
       
     }
     else {  

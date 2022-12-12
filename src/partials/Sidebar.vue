@@ -204,55 +204,7 @@
                 </ul>
               </div>
             </SidebarLinkGroup>
-            <!-- Utility -->
-            <SidebarLinkGroup v-slot="parentLink" :activeCondition="currentRoute.fullPath.includes('utility')">
-              <a class="block text-slate-200 hover:text-white truncate transition duration-150" :class="currentRoute.fullPath.includes('utility') && 'hover:text-slate-200'" href="#0" @click.prevent="sidebarExpanded ? parentLink.handleClick() : sidebarExpanded = true">
-                <div class="flex items-center justify-between">
-                  <div class="flex items-center">
-                    <svg class="shrink-0 h-6 w-6" viewBox="0 0 24 24">
-                      <circle class="fill-current text-slate-400" :class="currentRoute.fullPath.includes('utility') && 'text-indigo-300'" cx="18.5" cy="5.5" r="4.5" />
-                      <circle class="fill-current text-slate-600" :class="currentRoute.fullPath.includes('utility') && 'text-indigo-500'" cx="5.5" cy="5.5" r="4.5" />
-                      <circle class="fill-current text-slate-600" :class="currentRoute.fullPath.includes('utility') && 'text-indigo-500'" cx="18.5" cy="18.5" r="4.5" />
-                      <circle class="fill-current text-slate-400" :class="currentRoute.fullPath.includes('utility') && 'text-indigo-300'" cx="5.5" cy="18.5" r="4.5" />                    
-                    </svg>
-                    <span class="text-sm font-medium ml-3 lg:opacity-0 lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200">Debug</span>
-                  </div>
-                  <!-- Icon -->
-                  <div class="flex shrink-0 ml-2">
-                    <svg class="w-3 h-3 shrink-0 ml-1 fill-current text-slate-400" :class="parentLink.expanded && 'rotate-180'" viewBox="0 0 12 12">
-                      <path d="M5.9 11.4L.5 6l1.4-1.4 4 4 4-4L11.3 6z" />
-                    </svg>
-                  </div>
-                </div>
-              </a>
-              <div class="lg:hidden lg:sidebar-expanded:block 2xl:block">
-                <ul class="pl-9 mt-1" :class="!parentLink.expanded && 'hidden'">
-                  <router-link to="/utility/changelog" custom v-slot="{ href, navigate, isExactActive }">
-                    <li class="mb-1 last:mb-0">
-                      <a class="block text-slate-400 hover:text-slate-200 transition duration-150 truncate" :class="isExactActive && '!text-indigo-500'" :href="href" @click="navigate">
-                        <span class="text-sm font-medium lg:opacity-0 lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200">API Logs</span>
-                      </a>
-                    </li>
-                  </router-link>
-             
- 
-                  <router-link to="/utility/404" custom v-slot="{ href, navigate, isExactActive }">
-                    <li class="mb-1 last:mb-0">
-                      <a class="block text-slate-400 hover:text-slate-200 transition duration-150 truncate" :class="isExactActive && '!text-indigo-500'" :href="href" @click="navigate">
-                        <span class="text-sm font-medium lg:opacity-0 lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200">404</span>
-                      </a>
-                    </li>
-                  </router-link>
-                  <router-link to="/utility/knowledge-base" custom v-slot="{ href, navigate, isExactActive }">
-                    <li class="mb-1 last:mb-0">
-                      <a class="block text-slate-400 hover:text-slate-200 transition duration-150 truncate" :class="isExactActive && '!text-indigo-500'" :href="href" @click="navigate">
-                        <span class="text-sm font-medium lg:opacity-0 lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200">Guía Usuario - (PLUS)</span>
-                      </a>
-                    </li>
-                  </router-link>                  
-                </ul>
-              </div>
-            </SidebarLinkGroup>          
+                     
             
             
           </ul>

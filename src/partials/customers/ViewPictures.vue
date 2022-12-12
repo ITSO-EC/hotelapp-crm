@@ -30,7 +30,7 @@
     class="m-1 h-40 bg-slate-700 flex items-center justify-center relative">
       <img :src="getImage(photo)" class="object-cover h-36" alt="User Photo">
       <div
-      @click.stop="dangerGalleryModalOpen = true; selectedPicture = photo" 
+      @click.stop="dangerGalleryModalOpen = true;selectedPicture = []; selectedPicture.push(photo)" 
       class="cursor-pointer hover:bg-slate-300 active:bg-slate-50 absolute top-2 right-2 bg-slate-100 rounded-full p-2 text-red-500">
       
         <BaseIcon :name="'trash'"></BaseIcon>
@@ -135,11 +135,11 @@
                 hover:border-slate-300
                 text-slate-600
               "
-              @click.stop="dangerGalleryModalOpen = false"
+              @click.stop="dangerGalleryModalOpen = false; selectedPicture = []"
             >
               Cancelar
             </button>
-            <button @click.stop="dangerGalleryModalOpen = false; deleteImage(selectedPicture, userid)" class="btn-sm bg-rose-500 hover:bg-rose-600 text-white">
+            <button @click.stop="dangerGalleryModalOpen = false; deleteImage(selectedPicture, userid); selectedPicture = []" class="btn-sm bg-rose-500 hover:bg-rose-600 text-white">
               Si, eliminar
             </button>
           </div>
@@ -163,7 +163,7 @@ import BaseIcon from '../../components/BaseIcon.vue';
 const previewImage = ref(DefaultImage);
 const basicGalleryModalOpen = ref(false);
 const dangerGalleryModalOpen = ref(false);
-const selectedPicture = ref('')
+const selectedPicture = ref([])
 const props = defineProps(['gallery', 'userid']) //user=>id
 const {getImage} = useResources();
 const {addImage, deleteImage} = useUsers();

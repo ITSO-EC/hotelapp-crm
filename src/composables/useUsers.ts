@@ -91,16 +91,18 @@ const useUsers = () => {
       })
       await initializeClients();
     }
-    const deleteImage = async(imagestr, userid) => {
+    const deleteImage = async(imagestr:string[], userid) => {
       await axios.patch(BASE_API+'users/deleteImages/'+userid,
       {
-        file: imagestr
+        files: [imagestr[0] ]     
       },
       {
         headers: {
-          'Content-Type' : 'application/json'
+          'Content-Type':'application/json; charset=utf-8',
+          'Content-Security-Policy': "default-src 'self';base-uri 'self';block-all-mixed-content;font-src 'self' https: data:;frame-ancestors 'self';img-src 'self' data:;object-src 'none';script-src 'self';script-src-attr 'none';style-src 'self' https: 'unsafe-inline';upgrade-insecure-requests"
         }
-      })
+      }
+      )
       await initializeClients();
     }
   

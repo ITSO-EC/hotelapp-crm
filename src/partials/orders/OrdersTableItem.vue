@@ -12,11 +12,11 @@
         <div>{{ convertTime(order.createdAt) }}</div>
       </td>
       <td class="first:pl-5 last:pr-5 px-2 pl-6 py-3 whitespace-nowrap">
-        <div class="font-medium text-slate-800">{{ order.user.name }}</div>
+        <div class="font-medium text-slate-800">{{ order?.user?.name }}</div>
       </td>
       <td class="first:pl-5 last:pr-5 px-2 whitespace-nowrap py-3 overflow-hidden">
         <span class="pl-3 font-medium text-emerald-500 inline-block w-24 text-ellipsis overflow-hidden">
-          {{order.user.room}}
+          {{order?.user?.room || '---'}}
         </span>
       </td>
       <td class="first:pl-5 last:pr-4 px-2 py-3 whitespace-nowrap pr-10 w-24">
@@ -71,8 +71,8 @@
           </svg>
           
           <div class="italic">
-            <h1 class="font-bold">{{order.user.name}} pidió:</h1>
-            <p>{{order.item?.name}} {{`${props.rooftop ? "":"para la habitación " + order.user.room}`}} </p>
+            <h1 class="font-bold">{{order?.user?.name}} pidió:</h1>
+            <p>{{order?.item?.name}} {{`${rooftop ? "":"para la habitación " + (order?.user?.room || '---')}`}} </p>
           </div>
         </div>
       </td>
