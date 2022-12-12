@@ -85,23 +85,24 @@ const router = createRouter({
 
 router.beforeEach(async (to,from)=>{  
   const authStore = useAuthStore();
+  if(to.name !== 'Login' && authStore?.user?.role ==='user') {
+    return {name:'Login'}
+  }
   if(to.name !== 'Login' && !authStore.user) {
     let uid = Cookies.get('user_id');
     let at = Cookies.get('access_token');
     if(uid && at)
     {
       let response = await axios.get(BASE_API+'/users/'+uid)
+     
       authStore.loadUser(response.data)
       
     }
+    
     else {  
       return {name : 'Login'}
     }
       
-    
-    
-
-    
   }
   
 })
