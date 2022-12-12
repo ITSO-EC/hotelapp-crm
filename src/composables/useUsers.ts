@@ -91,11 +91,14 @@ const useUsers = () => {
       })
       await initializeClients();
     }
-    const deleteImage = async(payload, userid) => {
+    const deleteImage = async(imagestr, userid) => {
       await axios.patch(BASE_API+'users/deleteImages/'+userid,
       {
+        file: imagestr
+      },
+      {
         headers: {
-          'Content-Type' : 'multipart/form-data'
+          'Content-Type' : 'application/json'
         }
       })
       await initializeClients();

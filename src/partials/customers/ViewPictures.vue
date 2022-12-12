@@ -29,7 +29,9 @@
     
     class="m-1 h-40 bg-slate-700 flex items-center justify-center relative">
       <img :src="getImage(photo)" class="object-cover h-36" alt="User Photo">
-      <div class="cursor-pointer hover:bg-slate-300 active:bg-slate-50 absolute top-2 right-2 bg-slate-100 rounded-full p-2 text-red-500">
+      <div
+      @click.stop="dangerGalleryModalOpen = true; selectedPicture = photo" 
+      class="cursor-pointer hover:bg-slate-300 active:bg-slate-50 absolute top-2 right-2 bg-slate-100 rounded-full p-2 text-red-500">
       
         <BaseIcon :name="'trash'"></BaseIcon>
       </div>
@@ -80,6 +82,70 @@
       </div>
     </ModalBasic>
     
+    
+    <!-- Delete Profile -->
+    <ModalBlank
+      :id="`danger-gallery-modal-gallery`"
+      :modalOpen="dangerGalleryModalOpen"
+      @close-modal="dangerGalleryModalOpen = false"
+    >
+      <div class="p-5 flex space-x-4">
+        <!-- Icon -->
+        <div
+          class="
+            w-10
+            h-10
+            rounded-full
+            flex
+            items-center
+            justify-center
+            shrink-0
+            bg-rose-100
+          "
+        >
+          <svg
+            class="w-4 h-4 shrink-0 fill-current text-rose-500"
+            viewBox="0 0 16 16"
+          >
+            <path
+              d="M8 0C3.6 0 0 3.6 0 8s3.6 8 8 8 8-3.6 8-8-3.6-8-8-8zm0 12c-.6 0-1-.4-1-1s.4-1 1-1 1 .4 1 1-.4 1-1 1zm1-3H7V4h2v5z"
+            />
+          </svg>
+        </div>
+        <!-- Content -->
+        <div>
+          <!-- Modal header -->
+          <div class="mb-2">
+            <div class="text-lg font-semibold text-slate-800">
+              ¿Está seguro que desea eliminar esta foto?
+            </div>
+          </div>
+          <!-- Modal content -->
+          <div class="text-sm mb-10">
+            <div class="space-y-2">
+              <p>Considere que esta acción es irreversible.</p>
+            </div>
+          </div>
+          <!-- Modal footer -->
+          <div class="flex flex-wrap justify-end space-x-2">
+            <button
+              class="
+                btn-sm
+                border-slate-200
+                hover:border-slate-300
+                text-slate-600
+              "
+              @click.stop="dangerGalleryModalOpen = false"
+            >
+              Cancelar
+            </button>
+            <button @click.stop="dangerGalleryModalOpen = false; deleteImage(selectedPicture, userid)" class="btn-sm bg-rose-500 hover:bg-rose-600 text-white">
+              Si, eliminar
+            </button>
+          </div>
+        </div>
+      </div>
+    </ModalBlank>
   </div>
 
 </template>
@@ -96,6 +162,8 @@ import BaseIcon from '../../components/BaseIcon.vue';
 
 const previewImage = ref(DefaultImage);
 const basicGalleryModalOpen = ref(false);
+const dangerGalleryModalOpen = ref(false);
+const selectedPicture = ref('')
 const props = defineProps(['gallery', 'userid']) //user=>id
 const {getImage} = useResources();
 const {addImage, deleteImage} = useUsers();
@@ -161,9 +229,10 @@ const newPic =  ref({
 })
 const clickInput = (e) => {
   const input = document.querySelector(`#gallery-input-${props?.userid}`)
-  e.preventDefault();
+  input.addEventListener('click', event=>{
+    event.stopPropagation()
+  })
   input.click();
-  e.preventDefault();
 }
 
 const uploadImage = (e) => {
