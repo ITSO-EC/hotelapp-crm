@@ -92,17 +92,25 @@ const useUsers = () => {
       await initializeClients();
     }
     const deleteImage = async(imagestr:string[], userid) => {
-      await axios.patch(BASE_API+'users/deleteImages/'+userid,
-      {
-        files: [imagestr[0] ]     
-      },
-      {
-        headers: {
-          'Content-Type':'application/json; charset=utf-8',
-          'Content-Security-Policy': "default-src 'self';base-uri 'self';block-all-mixed-content;font-src 'self' https: data:;frame-ancestors 'self';img-src 'self' data:;object-src 'none';script-src 'self';script-src-attr 'none';style-src 'self' https: 'unsafe-inline';upgrade-insecure-requests"
-        }
-      }
-      )
+     
+      let headersList = {
+        "Accept": "/",
+        
+       }
+       
+       let formdata = new FormData();
+       formdata.append("files", JSON.stringify([imagestr[0]]));
+       
+       let bodyContent =  formdata;
+       
+       let reqOptions = {
+         url: "https://hotelapp.fastery.dev/v1/users/deleteImages/"+userid,
+         method: "PATCH",
+         headers: headersList,
+         data: bodyContent,
+       }
+       
+      await axios.request(reqOptions);
       await initializeClients();
     }
   
