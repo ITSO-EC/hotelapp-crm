@@ -36,6 +36,27 @@
                 >Editar Cliente</button
               >
             </li>
+            <li v-if="customer.allowQualify"><button  
+              @click="editUser({allowQualify: false}, customer.id).then((res)=>initializeClients())"
+              class="
+                  font-medium
+                  text-sm text-rose-500
+                  hover:text-rose-600
+                  flex
+                  py-1
+                  px-3
+                ">Deshabilitar Review</button></li>
+            <li v-else  ><button 
+              @click="editUser({allowQualify: true}, customer.id).then((res)=>initializeClients())"
+              
+              class="
+                  font-medium
+                  text-sm text-emerald-500
+                  hover:text-emerald-600
+                  flex
+                  py-1
+                  px-3
+                "> Habilitar Review</button></li>
             <li>
               <button
                 class="

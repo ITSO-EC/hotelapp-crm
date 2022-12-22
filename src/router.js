@@ -35,6 +35,7 @@ const router = createRouter({
 
     //Friendstel Related
     {
+      name: 'Orders',
       path: '/ecommerce/orders',
       component: Orders
     },

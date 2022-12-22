@@ -50,11 +50,12 @@ import DashboardCardMenu from '../partials/dashboard/DashboardCardMenu.vue'
 import DashboardCard02 from '../partials/dashboard/DashboardCard02.vue'
 import DashboardCard04 from '../partials/dashboard/DashboardCard04.vue'
 import DashboardCard10 from '../partials/dashboard/DashboardCard10.vue'
+import axios from 'axios'
 
 
 //import usersFactory from '../factories/userFactory'
 //import itemsFactory from '../factories/itemFactory'
-//import ordersFactory from '../factories/orderFactory'
+import ordersFactory from '../factories/orderFactory'
 //import roomsFactory from '../factories/roomFactory'
 
 const sidebarOpen = ref(false)
@@ -85,4 +86,6 @@ const sidebarOpen = ref(false)
 //Genera Orders / Borra 
 //generateOrders(20);
 //destroyOrders()
+
+
 </script>

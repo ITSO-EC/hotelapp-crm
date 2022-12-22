@@ -70,26 +70,45 @@
 </template>
 
 <script setup>
+  import {ref,onMounted,onUnmounted} from 'vue'
+  import useRooms from "../../composables/useRooms";
   import useOrders from "./../../composables/useOrders";
-  import useUsers from "./../../composables/useUsers";
-  
+  import useUsers from "./../../composables/useUsers";  
   import Order from "./OrdersTableItem.vue";
-  
-  const { orders,  initializeAllOrders, retrieveRooftopOrders, loading,results } = useOrders();
+  import { onBeforeRouteLeave, useRoute } from "vue-router";
+
+  const {initializeRooms, rooms} = useRooms();
+  const { orders,  initializeAllOrders, retrieveRooftopOrders, loading,results,page } = useOrders();
+  const route = useRoute();
   const props = defineProps({
     rooftop: {
       type: Boolean,
       default: false
     }
   });
+  function initializeOrders(silent=false) {
+    if(!props.rooftop){
+    initializeAllOrders(page.value, silent);
+    }
+    else {
+      retrieveRooftopOrders(page.value, silent)
+    }
+
+  }
   
-  if(!props.rooftop){
-    initializeAllOrders();
-  }
-  else {
-    retrieveRooftopOrders()
-  }
+  const interval = ref(null);
+  onMounted(()=> {
+    initializeOrders();
+    initializeRooms();
+    interval.value =  setInterval(() => {
+        console.log("Silent updt")
+        initializeOrders(true);
+    }, 3000);
+  })
 
- 
-
+  
+  onUnmounted(()=> {
+    console.log("Unmounted");
+    clearInterval(interval.value);
+  })
 </script>

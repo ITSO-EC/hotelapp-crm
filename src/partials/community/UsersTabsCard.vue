@@ -17,7 +17,7 @@
         <div class="relative">
           <EditMenu align="right" class="absolute top-0 right-0 inline-flex">
             <li>
-              <router-link
+              <button
                 class="
                   font-medium
                   text-sm text-slate-600
@@ -26,14 +26,13 @@
                   py-1
                   px-3
                 "
-                to="#0"
                 @click.stop="basicModalOpen = true"
-                >Editar perfil</router-link
+                >Editar perfil</button
               >
             </li>
          
             <li>
-              <router-link
+              <button
                 class="
                   font-medium
                   text-sm text-rose-500
@@ -42,11 +41,34 @@
                   py-1
                   px-3
                 "
-                to="#0"
+               
                 @click.stop="dangerModalOpen = true"
-                >Eliminar</router-link
+                >Eliminar</button
               >
             </li>
+
+            <li v-if="item.allowQualify"><button  
+              @click="editUser({allowQualify: false}, item.id).then((res)=>initializeAdmins())"
+              class="
+                  font-medium
+                  text-sm text-rose-500
+                  hover:text-rose-600
+                  flex
+                  py-1
+                  px-3
+                ">Prohibir Review</button></li>
+            <li v-else  ><button 
+              @click="editUser({allowQualify: true}, item.id).then((res)=>initializeAdmins())"
+              
+              class="
+                  font-medium
+                  text-sm text-emerald-500
+                  hover:text-emerald-600
+                  flex
+                  py-1
+                  px-3
+                "> Habilitar Review</button></li>
+            
           </EditMenu>
         </div>
         <!-- Image + name -->
@@ -252,7 +274,7 @@ import ModalBlank from '../../components/ModalBlank.vue'
 import {useRouter,useRoute} from 'vue-router';
 import DefaultImage from '../../images/user-avatar-80.png'
 import useResources from '../../composables/useResources'
-import useUsers from "../../composables/useUsers";
+import useAdmins from "../../composables/useAdmins";
 import useAuth from "../../composables/useAuth";
 const basicModalOpen = ref(false);
 const roleModalOpen = ref(false);
@@ -263,7 +285,7 @@ const previewImage = ref(DefaultImage);
 const router = useRouter();
 const route = useRoute();
 const {getImage} = useResources()
-const {deleteUser} = useUsers();
+const {deleteUser, initializeAdmins} = useAdmins();
 const { editUser} = useAuth();
 const props = defineProps(['item']);
 const itemRef = ref({
@@ -278,10 +300,6 @@ const newUser = ref({
   
 })
 
-const clickInput = () => {
-  let input = document.querySelector(`#image-input-${props.item.id}`)
-  input.click();
-}
 
 const updateUser = async() => {
   console.log(newUser.value.file)
@@ -292,6 +310,10 @@ const updateUser = async() => {
   router.push(route.path)
 }
 
+const clickInput = () => {
+  let input = document.querySelector(`#image-input-${props.item.id}`)
+  input.click();
+}
 const uploadImage = (e) => {
   const image = e.target.files[0];
   

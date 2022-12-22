@@ -200,6 +200,7 @@ const newUser = ref({
     password: '',
     phoneNumber: '',
     role: 'user',
+    allowQualify: true,
 })
 const selectedItems = ref([])
 const updateSelectedItems = (selected) => {
@@ -213,7 +214,8 @@ function resetData() {
       password: '',            
       phoneNumber: '',
       role: 'user',
-      room: ''
+      room: '',
+      allowQualify: true
     }
     confirmation.value = ''
   }

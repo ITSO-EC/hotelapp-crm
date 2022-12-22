@@ -13,16 +13,16 @@ const useOrders = () => {
     const {orders, selectedOrder,error, loading, results, page, pages} = storeToRefs(ordersStore);
 
 
-    const initializeAllOrders = async (page:number=1) => {
-      loading.value = true;
+    const initializeAllOrders = async (page:number=1, silent:boolean=false) => {
+      loading.value = !silent;
       ordersStore.loadOrders(await axios.get(BASE_API+'orders?populate=item,user&page='+page));  
       loading.value = false;
     }
     const retrieveOrdersByUser = async (userid:string,page:number=1) => {
       ordersStore.loadOrders(await axios.get(BASE_API+'orders?user='+ userid +'&page='+page)); 
     }
-    const retrieveRooftopOrders = async (page:number=1) => {
-      loading.value = true;
+    const retrieveRooftopOrders = async (page:number=1,silent:boolean=false) => {
+      loading.value = !silent;
       ordersStore.loadOrders(await axios.get(BASE_API+'orders?item=63945f93c33e836efa9d3c7b&populate=item,user&page='+page));
       loading.value = false;
     }

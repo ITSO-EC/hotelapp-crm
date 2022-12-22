@@ -66,7 +66,7 @@ const useAuth = () => {
           error.value = err.response.data.message;
           loading.value = false;
           
-          }
+        }
     };
 
     const login = async(payload:User) => {

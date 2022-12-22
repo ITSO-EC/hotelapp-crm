@@ -111,19 +111,44 @@ const getDoorKey = async (selpage: number = 1) => {
     const updateItem = async( payload, id:string ) =>{
       loading.value = true;
       
-
       try {
-        await axios.patch(BASE_API+'items/'+id, payload ,{
-          headers: {
-            'Content-type':'application/json'
-          }
-        })
-        initializeItems(page.value);
-        loading.value = false;
-      } catch (err) {
-        error.value = err;
-        loading.value = false;
+        if(payload.file){
+          let response = await axios.patch(BASE_API+'items/addImages/'+id, payload,
+          {
+            headers: {
+              'Content-Type' : 'multipart/form-data'
+            }
+          })
+          let itemImage = response?.data.imageUrl[response?.data.imageUrl.length-1];
+          let response2 = await axios.patch(BASE_API+'items/'+id, {imageUrl: itemImage} ,
+          {
+            headers: {
+              'Content-Type' : 'application/json'
+            }
+          })
+          
+          await initializeItems();
+          loading.value = false;
+        }
+        else{
+          let response = await axios.patch(BASE_API+'items/'+id, payload,
+          {
+            headers: {
+              'Content-Type' : 'application/json'
+            }
+          })
+          await initializeItems();
+          loading.value = false;
+        }
+       
+        
       }
+      catch(err) {
+        error.value = err.response.data.message;
+        loading.value = false;
+        
+      }
+      
       
   };
 

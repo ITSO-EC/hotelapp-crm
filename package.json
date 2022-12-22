@@ -11,6 +11,7 @@
     "axios": "^0.27.2",
     "chart.js": "^3.8.0",
     "chartjs-adapter-moment": "^1.0.0",
+    "file-saver": "^2.0.5",
     "flatpickr": "^4.6.13",
     "js-cookie": "^3.0.1",
     "moment": "^2.29.4",
