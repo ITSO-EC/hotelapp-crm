@@ -38,20 +38,46 @@ const useUsers = () => {
     }
 
     const createUser = async(payload:User) => {
-        loading.value = true;
-        try {
-          await axios.post(BASE_API+'users', payload).then((res)=> newUserId.value = res.data.id)
+      loading.value = true;
+      
+      try {
+
+        if(!payload.file) {
+            
+          await axios.post(BASE_API+'users', payload, 
+          {
+            headers:{
+              'Content-Type': 'application/json'
+            }
+          });
+          await initializeClients();
           loading.value = false;
-          await initializeClients()
+        }
+        else {
+          let response = await axios.post(BASE_API+'users', payload, 
+          {
+            headers:{
+              'Content-Type': 'multipart/form-data'
+            }
+          });
+          let userImages = response?.data.imageUrl;
+          let response2 = await axios.patch(BASE_API+'users/'+response?.data.id, {profileImageUrl: userImages[userImages.length - 1]} ,
+          {
+            headers: {
+              'Content-Type' : 'application/json'
+            }
+          })
+          await initializeClients();
+          loading.value = false;
+        }
 
         
-        } catch (err) {
-         
-          error.value = err.response.data.message;
-          loading.value=false;
-        }
-        
+      } catch (err) {
+        error.value = err.response.data.message;
+        loading.value=false;
+      }
       
+    
     };
 
     const editUser = async(payload:User, id:string) => {

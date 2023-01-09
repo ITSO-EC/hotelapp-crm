@@ -64,11 +64,23 @@
   </div>
 </template>
 <script setup>
-  import useUsers from '../../composables/useUsers';
-  import Customer from './CustomersTableItem.vue';
-  
-  const emits= defineEmits('edit-customer');
-  const {users, loading, results} = useUsers();
-  
+//////////////////////////////////////////
+//Import Component Dependencies
+//////////////////////////////////////////
+
+//Vue + Components
+import useUsers from '../../composables/useUsers';
+import Customer from './CustomersTableItem.vue';
+
+//////////////////////////////////////////
+//Variables + Refs Init
+//////////////////////////////////////////
+
+//Vue Related Init
+const emits = defineEmits('edit-customer');
+
+//Composables Init
+const {users, loading, results} = useUsers();
+
 
 </script>

@@ -9,9 +9,7 @@
       <Toast :type="'error'" :open="error?.response" @close-toast="error=null; error1=null; succestoast = false" 
       class="fixed z-40 mt-16 w-1/3">{{error?.response?.data != null? error.response?.data?.message :''}}</Toast>
 
-      <Toast :type="'success'" :open="!error && succestoast && !loading" 
-      @close-toast="succestoast=false" class="fixed z-40 mt-16 w-1/3">
-      Órden creada exitosamente.</Toast>
+     
       <!-- Site header -->
       <Header :sidebarOpen="sidebarOpen" @toggle-sidebar="sidebarOpen = !sidebarOpen" />
       <Toast :type="'error'" :open="error" @close-toast="error=null; succestoast = false" class="fixed z-40 mt-16 w-1/3">{{error}}</Toast>
@@ -46,7 +44,7 @@
           <!-- Cards -->
           <div v-if="!loading" class="grid grid-cols-12 gap-6" :key="`${loading}-page-${page}`">
             <UsersTabsCard
-            
+              @edit-profile="succestoast=true"
               v-for="item in users"
               :key="item?.id"
               :item="item"
@@ -72,11 +70,13 @@
       </main>
 
     </div> 
-    <!-- Create Profile -->
+
+    <!-- Hidden modals until trigger -->
+    <!-- CREATE Profile -->
     <ModalBasic
       :modalOpen="registerModalOpen"
       @close-modal="registerModalOpen = false"
-      title="Registrar Operador"
+      title="Registrar Staff"
     >
       <!-- Modal content -->
       <div class="px-5 pt-4 pb-1">
@@ -84,60 +84,103 @@
           <div class="font-medium text-slate-800 mb-2">
             Haga click sobre el círculo y elija una foto de perfil.
           </div>
+
+          <!-- Form Start -->
           <div class="space-y-2 grid grid-cols-1 sm:grid-cols-2 gap-4">
             
+
+            <!-- Image - Error Messages -->
+            <div class="flex flex-col">
+              <p class="text-xs text-red-500 font-medium italic mt-2" for="name-create" :hidden="registerErrors.imageFormat">
+              *  El formato de Imagen no es permitido (Solo "jpg", "png" o "jpeg")
+              </p>
+              <p class="text-xs text-red-500 font-medium italic mb-1" for="name-create" :hidden="registerErrors.imageSize">
+              *  Imagen muy pesada (Máx. 1.5MB)
+              </p>
+              
+            </div>
+
+            <!-- Profile Pic - Image Chooser -->
             <div class="flex justify-center sm:col-span-2">
               <input id="image-input" class="hidden" accept="image/jpeg, image/png, image/jpg" type="file" @change="uploadImage">
           
               <img
               @click="clickInput"
-                class="rounded-full cursor-pointer hover:grayscale ease-in-out duration-300 active:grayscale-0"
+                class="rounded-full 
+                w-[64px]
+                h-[64px]
+                cursor-pointer hover:grayscale ease-in-out duration-300 active:grayscale-0"
                 :src="`${previewImage}`"
                 width="64"
                 height="64"
                 :alt="'Foto de perfil'"
               />
             </div>
-            <!-- Start -->
+            
+            <!-- Name Input + Label -->
             <div>
-              <label class="block text-sm font-medium mb-1 mt-2" for="name"
-                >Nombre y Apellido</label
-              >
+              <label class="block text-sm font-medium mb-1 mt-2" for="name">
+                Nombre y Apellido
+              </label>
+              <p class="text-xs text-red-500 font-medium italic mb-1 mt-2" for="name-create" :hidden="registerErrors.name">
+                *  El nombre no puede estar vacío
+              </p>
               <input id="name" class="form-input w-full" type="text" v-model="newUser.name"/>
             </div>
-            <!-- Start -->
+          
+            <!-- Mail Input + Label -->
             <div>
               <label class="block text-sm font-medium mb-1 mt-2" for="email"
                 >Correo</label
               >
+              <p class="text-xs text-red-500 font-medium italic mb-1 mt-2" for="name-create" :hidden="registerErrors.mail">
+                *  El correo no es válido
+              </p>
               <input id="email" class="form-input w-full" type="text" v-model="newUser.email"/>
             </div>
 
             
-            <!-- Start -->
+            <!-- Cellphone Input + Label -->
             <div>
               <label class="block text-sm font-medium mb-1" for="cellphone"
-                >Celular</label
-              >
+                >Celular
+              </label>
+              <p class="text-xs text-red-500 font-medium italic mb-1 mt-2" for="name-create" :hidden="registerErrors.cellphone">
+                *  El nro. celular no es válido
+              </p>
+          
               <input id="cellphone" class="form-input w-full" type="text" v-model="newUser.phoneNumber" />
             </div>
 
            
-            <!-- Start -->
+            <!-- Password Input + Label -->
             <div>
               <label class="block text-sm font-medium mb-1" for="password"
-                >Clave</label
-              >
+                >Clave
+              </label>
+              <p class="text-xs text-red-500 font-medium italic mb-1 mt-2" for="name-create" :hidden="registerErrors.password">
+                *  La clave no puede estar vacía
+              </p>
+              <p class="text-xs text-red-500 font-medium italic mb-1 mt-2" for="name-create" :hidden="registerErrors.passwordValid">
+                *  Minimo 6 caracteres
+              </p>
+
               <input id="password" class="form-input w-full" type="password" v-model="newUser.password"/>
             </div>
-            <!-- Start -->
+
+            <!-- Confirmation Input + Label -->
             <div>
-              <label class="block text-sm font-medium mb-1" for="confirm_password"
-                >Confirmar Clave</label
-              >
+              <label class="block text-sm font-medium mb-1" for="confirm_password">
+                Confirmar Clave
+              </label>
+              <p class="text-xs text-red-500 font-medium italic mb-1 mt-2" for="name-create" :hidden="registerErrors.passwordConfirm">
+                *  Las claves no coinciden
+              </p>
+
               <input id="confirm_password" class="form-input w-full" type="password" v-model="confirmation"/>
             </div>
-             <!-- Select -->
+
+             <!-- Role Select + Label -->
             <div>
               <label class="block text-sm font-medium mb-1" for="country"
                 >Rol</label
@@ -163,8 +206,13 @@
           >
             Cancelar
           </button>
-          <button :disabled="loading" @click="createNewUser()" class="btn-sm disabled:bg-indigo-300 bg-indigo-500 hover:bg-indigo-600 text-white">
-            Guardar
+          <button :disabled="!isNewUserValid || loading" @click="createNewUser()" class="btn-sm disabled:bg-indigo-300 bg-indigo-500 hover:bg-indigo-600 text-white">
+            <span :hidden="loading">Guardar</span>
+            <span :hidden="!loading">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="animate-spin h-5 w-5 mx-5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
+              </svg>
+            </span>
           </button>
         </div>
       </div>
@@ -173,57 +221,149 @@
 </template>
 
 <script setup>
-import { ref,onMounted } from 'vue'
+//////////////////////////////////////////
+//Import Component Dependencies
+//////////////////////////////////////////
+
+//Vue + Components
+import { ref,watch } from 'vue'
 import Sidebar from '../../partials/Sidebar.vue'
 import Header from '../../partials/Header.vue'
 import UsersTabsCard from '../../partials/community/UsersTabsCard.vue'
 import PaginationNumeric from '../../components/PaginationNumeric.vue'
 import ModalBasic from '../../components/ModalBasic.vue'
-import useUsers from '../../composables/useAdmins'
 import Toast from '../../components/Toast.vue'
-
-import DefaultImage from '../../images/user-avatar-80.png'
-import useAuth from '../../composables/useAuth'
+import useUsers from '../../composables/useAdmins'
 import { useRouter, useRoute } from 'vue-router'
+
+//Composables
+import useAuth from '../../composables/useAuth'
 import useResources from '../../composables/useResources'
-const previewImage = ref(DefaultImage);
-const {getImage} = useResources()
+
+//Media
+import DefaultImage from '../../images/user-avatar-80.png'
+
+//////////////////////////////////////////
+//Variables + Refs Init
+//////////////////////////////////////////
+
+//Vue Related Init
 const router = useRouter();
 const route = useRoute();
 
+//Composables Init
+const {getImage} = useResources()
 const  { initializeAdmins, createUser, loading, users, error,results,page ,pages } = useUsers() 
-const sidebarOpen = ref(false)
-const confirmation = ref('')
+
+//Refs Init
+const sidebarOpen = ref(false);
+const confirmation = ref('');
 const succestoast = ref(false);    
-const registerModalOpen = ref(false)
+const registerModalOpen = ref(false);
+const previewImage = ref(DefaultImage);
 
-
+const isNewUserValid = ref(false);
 const newUser = ref({
   name: '',
   email: '',
   password: '',
   phoneNumber: '',
   role: 'admin',
+  room: '63bb8cbf9955aa3847ba6e7c'
+});
+  //Register Modal Errors
+const registerErrors = ref({
+  imageFormat: true,
+  imageSize: true,
+  name: true,
+  mail: true,
+  cellphone: true,
+  password: true,
+  passwordValid: true,
+  passwordConfirm: true,
 })
-function resetData() {
-    newUser.value = {
-    name: '',
-    email: '',
-    password: '',            
-    phoneNumber: '',
-    role: 'admin',
-  }
-  confirmation.value = ''
-}
 
+//////////////////////////////////////////
+//Component Functionality 
+//////////////////////////////////////////
+
+//Core Actions - CRUD / Specific Actions
 const createNewUser = async() => {
-  
+  error.value = "";
+  succestoast.value = false;
+
   await createUser(newUser?.value);
   registerModalOpen.value=false; 
+
+  resetData();
   succestoast.value=true
   router.push(route.path)
 }
 
+
+const resetErrors = () => {
+  registerErrors.value.imageFormat = false;
+  registerErrors.value.imageSize = false;
+  registerErrors.value.name = false;
+  registerErrors.value.mail = false;
+  registerErrors.value.cellphone = false;
+  registerErrors.value.password = false;
+  registerErrors.value.passwordValid = false;
+  registerErrors.value.passwordConfirm = false;
+}
+
+const resetData = () => {
+  if(!error.value) {
+    previewImage.value = DefaultImage;
+
+    newUser.value.name= '';
+    newUser.value.email= '';
+    newUser.value.password= '';            
+    newUser.value.phoneNumber= '';
+    delete newUser.value.file;
+    newUser.value.role= 'admin';
+    newUser.value.room= '63bb8cbf9955aa3847ba6e7c';
+    
+    confirmation.value = ''
+    resetErrors();
+  }  
+}
+
+
+const checkValidUser = () => {
+  isNewUserValid.value = false;
+
+  if(loading.value) {
+    isNewUserValid.value = false
+    return;
+  };
+
+  let valid = true;
+  Object.entries(registerErrors.value).forEach(([key, value]) => {
+    if(!value && key != "imageFormat" && key != "imageSize") {
+      valid = false;
+      return;
+    }
+  });
+
+  if(valid) isNewUserValid.value = true;
+
+}
+// Register Form Validation
+const phoneNumberRegex = /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/im;
+const emailRegex = /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/;
+watch([newUser.value, confirmation], ([currentValue, newConfirm]) => {
+      (currentValue.name.length > 0) ? registerErrors.value.name = true : registerErrors.value.name = false;
+      (phoneNumberRegex.exec(currentValue.phoneNumber)!=null) ? registerErrors.value.cellphone = true : registerErrors.value.cellphone = false;
+      (emailRegex.exec(currentValue.email)!=null) ? registerErrors.value.mail = true : registerErrors.value.mail = false;
+      (currentValue.password.length > 0) ? registerErrors.value.password = true : registerErrors.value.password = false; 
+      (currentValue.password.length > 5 || currentValue.password.length < 1) ? registerErrors.value.passwordValid = true : registerErrors.value.passwordValid = false;
+      (newConfirm == currentValue.password) ? registerErrors.value.passwordConfirm = true : registerErrors.value.passwordConfirm = false; 
+      checkValidUser();
+    }
+  );
+
+//Utils - UI / Parsing / Any Other Un-Specific Component Action
 const clickInput = () => {
   const input = document.querySelector('#image-input')
   input.click();
@@ -231,16 +371,40 @@ const clickInput = () => {
 
 const uploadImage = (e) => {
   const image = e.target.files[0];
-  newUser.value.file = e.target.files[0];
-
-  const reader = new FileReader();
-  reader.readAsDataURL(image);
-  reader.onload = e =>{
-  previewImage.value = e.target.result;
-  ;
-  };
+  if(e.target.files.length > 0)
+  {
+    let fileTokens = e.target.files[0]?.name.split(".");
+    let fileType = fileTokens[fileTokens.length-1];
+    let imageSize = e.target.files[0]?.size / 1000 /1000
+      
+    
+    if(fileType == "jpeg" || fileType == "jpg" || fileType == "jpe" || fileType == "png" || fileType == "jfif")
+    {
+      registerErrors.value.imageFormat = true;
+      
+      if(imageSize < 1.5) {
+        registerErrors.value.imageSize = true;  
+        newUser.value.file = e.target.files[0];
+        const reader = new FileReader();
+        reader.readAsDataURL(image);
+        reader.onload = e =>{
+          previewImage.value = e.target.result;
+        };
+      }  
+      else {
+        registerErrors.value.imageSize = false;
+      }
+      
+    }
+    else {
+      registerErrors.value.imageFormat = false;
+    }
+    
+  }
+  
 }
 
-
+//Possible Required Hydration
 initializeAdmins()
+
 </script>

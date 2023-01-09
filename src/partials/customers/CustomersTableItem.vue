@@ -1,5 +1,6 @@
 <template>
   <tr :key="customer.id" class="text-center">
+    
     <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
       <div class="first:text-left">{{customer.name}}</div>
     </td>
@@ -84,42 +85,74 @@
       <!-- Modal content -->
       <div class="px-5 pt-4 pb-1">
         <div class="text-sm">
-         
+          <div class="font-medium text-slate-800 mb-2">
+            Haga click sobre el círculo y elija una foto de perfil.
+          </div>
+
+          <!-- Form Start -->
           <div class="space-y-2 grid grid-cols-1 sm:grid-cols-2 gap-4">
+
+             <!-- Image - Error Messages -->
+            <div class="flex flex-col">
+              <p class="text-xs text-red-500 font-medium italic mt-2" for="name-create" :hidden="editErrors.imageFormat">
+              *  El formato de Imagen no es permitido (Solo "jpg", "png" o "jpeg")
+              </p>
+              <p class="text-xs text-red-500 font-medium italic mb-1" for="name-create" :hidden="editErrors.imageSize">
+              *  Imagen muy pesada (Máx. 1.5MB)
+              </p>
+              
+            </div>
+          
+            <!-- Profile Pic - Image Chooser -->  
             <div class="flex justify-center sm:col-span-2">
               <input :id="`image-input-edit-${customer.id}`" class="hidden" accept="image/jpeg, image/png, image/jpg" type="file" @change="uploadImage">
           
               <img
                 @click="clickInput"
-                class="rounded-full cursor-pointer hover:grayscale ease-in-out duration-300 active:grayscale-0"
+                class="rounded-full 
+                w-[64px]
+                h-[64px]
+                cursor-pointer hover:grayscale ease-in-out duration-300 active:grayscale-0"
                 :src="customer.profileImageUrl? `${getImage(customer.profileImageUrl)}`: `${previewImage}`"
                 width="64"
                 height="64"
                 :alt="'Foto de perfil'"
               />
             </div>
-            <!-- Start -->
+
+            <!-- Name Input + Label -->
             <div class="mt-2">
               <label class="block text-sm font-medium mb-1 " :for="`name-${customer.id}`"
-                >Nombre</label
-              >
+                >Nombre</label>  
+              <p class="text-xs text-red-500 font-medium italic mb-1 mt-2" for="name-create" :hidden="editErrors.name">
+              *  El nombre no puede estar vacío
+              
+              </p>
               <input :id="`name-${customer.id}`" class="form-input w-full" type="text" v-model="newUser.name" />
             </div>
-            <!-- Start -->
+
+            <!-- Mail Input + Label -->
             <div>
               <label class="block text-sm font-medium mb-1 " :for="`email-${customer.id}`"
-                >Correo</label
-              >
+                >Correo</label>  
+              <p class="text-xs text-red-500 font-medium italic mb-1 mt-2" for="name-create" :hidden="editErrors.mail">
+              *  El correo no es válido
+              </p>
               <input :id="`email-${customer.id}`" class="form-input w-full" type="text" v-model="newUser.email" />
             </div>
-            <!-- Start -->
+
+            <!-- Cellphone Input + Label -->
             <div>
               <label class="block text-sm font-medium mb-1 " :for="`cellphone-${customer.id}`"
                 >Celular</label
-              >
+              >  
+              <p class="text-xs text-red-500 font-medium italic mb-1 mt-2" for="name-create" :hidden="editErrors.cellphone">
+              *  El nro. celular no es válido
+              </p>
               <input :id="`cellphone-${customer.id}`" class="form-input w-full" type="text" v-model="newUser.phoneNumber" />
             </div>
-            <!-- select -->
+            
+            <!-- Room Select + Label -->
             <div v-if="rooms">
               <label class="block text-sm font-medium mb-1" :for="`room-${customer.id}`" 
                 >Habitación</label
@@ -130,13 +163,15 @@
               
               </select>
             </div>
-            <!-- Start -->
+
+            <!-- Gallery -->
             <div class="sm:col-span-2 h-fit">
               <label class="block text-sm font-medium mb-1 h-12" :for="`gallery-${customer.id}`"
                 >Galería</label
               >
               <ViewPictures :gallery="customer.imageUrl" :userid="customer.id"></ViewPictures>
             </div>
+
           </div>
         </div>
       </div>
@@ -154,8 +189,13 @@
           >
             Cancelar
           </button>
-          <button @click.stop="editUserLocal()" class="btn-sm bg-indigo-500 hover:bg-indigo-600 text-white">
-            Guardar
+          <button :disabled="!isNewUserValid || loading" @click.stop="editUserLocal()" class="btn-sm disabled:bg-indigo-300 bg-indigo-500 hover:bg-indigo-600 text-white">
+            <span :hidden="loading">Guardar</span>
+            <span :hidden="!loading">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="animate-spin h-5 w-5 mx-5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
+              </svg>
+            </span>
           </button>
         </div>
       </div>
@@ -228,32 +268,50 @@
 </template>
 
 <script setup>
-import useUsers from '../../composables/useUsers';
-import useAuth from '../../composables/useAuth';
+//////////////////////////////////////////
+//Import Component Dependencies
+//////////////////////////////////////////
+
+//Vue + Components
+import { defineProps, watch, ref } from 'vue';
+import { useRouter, useRoute } from 'vue-router'
 import EditMenu from "../../components/DropdownEditMenu.vue";
 import ViewPictures from './ViewPictures.vue'
-import { defineProps, onMounted,ref } from 'vue';
-
 import ModalBasic from "../../components/ModalBasic.vue";
 import ModalBlank from '../../components/ModalBlank.vue'
 
-//Usado para el input de imagenes
-import DefaultImage from '../../images/user-avatar-80.png'
-import { useRouter, useRoute } from 'vue-router'
+//Composables
+import useUsers from '../../composables/useUsers';
+import useAuth from '../../composables/useAuth';
 import useResources from '../../composables/useResources'
 import useRooms from '../../composables/useRooms'
-const previewImage = ref(DefaultImage);
-const {getImage} = useResources()
+
+//Media
+import DefaultImage from '../../images/user-avatar-80.png'
+
+
+//////////////////////////////////////////
+//Variables + Refs Init
+//////////////////////////////////////////
+
+//Vue Related Init
 const router = useRouter();
 const route = useRoute();
-////
-const {  deleteUser,initializeClients } = useUsers();
-const { editUser } = useAuth();
 const props = defineProps(['customer', 'value', 'selected'])
+const emits = defineEmits(['edit-customer'])
+
+//Composables Init
+const { editUser, loading } = useAuth();
+const {getImage} = useResources();
 const { rooms, initializeRooms, updateRoom } = useRooms();
+const { deleteUser,initializeClients } = useUsers();
+
+//Refs Init
+const previewImage = ref(DefaultImage);
 const basicModalOpen = ref(false);
 const dangerModalOpen = ref(false);
 
+const isNewUserValid = ref(false);
 const newUser = ref({
   name: props.customer?.name,
   email: props.customer?.email,
@@ -266,24 +324,20 @@ const newUser = ref({
 const displayRoom = ref({
   number: props.customer?.room
 })
+  //Edit Modal Errors
+const editErrors = ref({
+  imageFormat: true,
+  imageSize: true,
+  name: true,
+  mail: true,
+  cellphone: true,
+})
 
-const convertDate = (date) => {
-  const monthNames = ["Ene", "Feb", "Mar", "Abr", "May", "Jun",
-  "Jul", "Ago", "Sep", "Oct", "Nov", "Dic", "Error"
-];
+//////////////////////////////////////////
+//Component Functionality 
+//////////////////////////////////////////
 
-  date = new Date(date)
-  let dd = date.getDate(); 
-  let mm = date.getMonth();
-  let yyyy = date.getFullYear(); 
-  if(dd<10){dd='0'+dd} 
-  return date = dd+'-'+monthNames[mm]+'-'+yyyy
-}
-
-const emits = defineEmits(['edit-customer'])
-
-
-
+//Core Actions - CRUD / Specific Actions
 const editUserLocal = async () => {
   if(!rooms.value) await initializeRooms();
 
@@ -306,24 +360,104 @@ const editUserLocal = async () => {
 
 }
 
+const getCheckout = (roomNumber) => {
+  //Assuming rooms is not empty !!CORRECT  
+  const resultRoom = rooms.value.find(item => item.number == roomNumber);
 
+  //TODO - Get checkout time
+
+}
+
+const resetErrors = () => {
+  editErrors.value.imageFormat = false;
+  editErrors.value.imageSize = false;
+  editErrors.value.name = false;
+  editErrors.value.mail = false;
+  editErrors.value.cellphone = false;
+}
+
+const checkValidUser = () => {
+  isNewUserValid.value = false;
+
+  if(loading.value) {
+    isNewUserValid.value = false
+    return;
+  };
+
+  let valid = true;
+  Object.entries(editErrors.value).forEach(([key, value]) => {
+    if(!value && key != "imageFormat" && key != "imageSize") {
+      valid = false;
+      return;
+    }
+  });
+
+  if(valid) isNewUserValid.value = true;
+
+}
+
+// Edit Form Validation
+const phoneNumberRegex = /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/im;
+const emailRegex = /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/;
+watch(newUser.value, (currentValue) => {
+    (currentValue.name.length > 0) ? editErrors.value.name = true : editErrors.value.name = false;
+    (phoneNumberRegex.exec(currentValue.phoneNumber)!=null) ? editErrors.value.cellphone = true : editErrors.value.cellphone = false;
+    (emailRegex.exec(currentValue.email)!=null) ? editErrors.value.mail = true : editErrors.value.mail = false;
+    checkValidUser();
+  }
+);
+//Utils - UI / Parsing / Any Other Un-Specific Component Action
+const convertDate = (date) => {
+  const monthNames = ["Ene", "Feb", "Mar", "Abr", "May", "Jun",
+  "Jul", "Ago", "Sep", "Oct", "Nov", "Dic", "Error"
+];
+
+  date = new Date(date)
+  let dd = date.getDate(); 
+  let mm = date.getMonth();
+  let yyyy = date.getFullYear(); 
+  if(dd<10){dd='0'+dd} 
+  return date = dd+'-'+monthNames[mm]+'-'+yyyy
+}
 const clickInput = () => {
   const input = document.querySelector(`#image-input-edit-${props.customer.id}`)
   console.log(props.customer.id)
   input.click();
-}
-
+} 
 const uploadImage = (e) => {
   const image = e.target.files[0];
-  newUser.value.file = e.target.files[0];
-  props.customer.profileImageUrl = null;
-
-  const reader = new FileReader();
-  reader.readAsDataURL(image);
-  reader.onload = e =>{
-  previewImage.value = e.target.result;
-  ;
-  };
+  if(e.target.files.length > 0)
+  {
+    let fileTokens = e.target.files[0]?.name.split(".");
+    let fileType = fileTokens[fileTokens.length-1];
+    let imageSize = e.target.files[0]?.size / 1000 /1000
+      
+    
+    if(fileType == "jpeg" || fileType == "jpg" || fileType == "jpe" || fileType == "png" || fileType == "jfif")
+    {
+      editErrors.value.imageFormat = true;
+      
+      if(imageSize < 1.5) {
+        editErrors.value.imageSize = true;  
+        newUser.value.file = e.target.files[0];
+        props.customer.profileImageUrl = null;
+        const reader = new FileReader();
+        reader.readAsDataURL(image);
+        reader.onload = e =>{
+          previewImage.value = e.target.result;
+        };
+      }  
+      else {
+        editErrors.value.imageSize = false;
+      }
+      
+    }
+    else {
+      editErrors.value.imageFormat = false;
+    }
+    
+  }
+  
 }
 
 </script>

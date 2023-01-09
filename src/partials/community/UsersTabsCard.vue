@@ -31,21 +31,6 @@
               >
             </li>
          
-            <li>
-              <button
-                class="
-                  font-medium
-                  text-sm text-rose-500
-                  hover:text-rose-600
-                  flex
-                  py-1
-                  px-3
-                "
-               
-                @click.stop="dangerModalOpen = true"
-                >Eliminar</button
-              >
-            </li>
 
             <li v-if="item.allowQualify"><button  
               @click="editUser({allowQualify: false}, item.id).then((res)=>initializeAdmins())"
@@ -69,6 +54,22 @@
                   px-3
                 "> Habilitar Review</button></li>
             
+                
+            <li>
+              <button
+                class="
+                  font-medium
+                  text-sm text-rose-500
+                  hover:text-rose-600
+                  flex
+                  py-1
+                  px-3
+                "
+               
+                @click.stop="dangerModalOpen = true"
+                >Eliminar</button
+              >
+            </li>
           </EditMenu>
         </div>
         <!-- Image + name -->
@@ -115,7 +116,7 @@
     <ModalBasic
       :modalOpen="basicModalOpen"
       @close-modal="basicModalOpen = false"
-      title="Editar Operador"
+      title="Editar Staff"
     >
       <!-- Modal content -->
       <div class="px-5 pt-4 pb-1">
@@ -123,13 +124,33 @@
           <div class="font-medium text-slate-800 mb-2">
             Para cambiar la foto de perfil, haga click sobre ella.
           </div>
+
+          <!-- Form Start -->
           <div class="space-y-2 grid grid-cols-1 sm:grid-cols-2 gap-4">
             
+            
+             <!-- Image - Error Messages -->
+             <div class="flex flex-col">
+              <p class="text-xs text-red-500 font-medium italic mt-2" for="name-create" :hidden="editErrors.imageFormat">
+              *  El formato de Imagen no es permitido (Solo "jpg", "png" o "jpeg")
+              </p>
+              <p class="text-xs text-red-500 font-medium italic mb-1" for="name-create" :hidden="editErrors.imageSize">
+              *  Imagen muy pesada (Máx. 1.5MB)
+              </p>
+              
+            </div>
+
+            <!-- Profile Pic - Image Chooser -->  
             <div class="flex justify-center sm:col-span-2">
               <input :id="`image-input-${item.id}`" class="hidden" accept="image/jpeg, image/png, image/jpg" type="file" @change="uploadImage">
               
               <img
-                class="rounded-full cursor-pointer hover:grayscale ease-in-out duration-300 active:grayscale-0 w-[64px] h-[64px] object-cover"
+                class="rounded-full 
+                cursor-pointer 
+                hover:grayscale ease-in-out duration-300 active:grayscale-0 
+                w-[64px] 
+                h-[64px] 
+                object-cover"
                 :src="`${itemRef.profileImageUrl ? getImage(itemRef.profileImageUrl): previewImage}`"
                 @click.stop="clickInput()"
                 width="64"
@@ -137,30 +158,43 @@
                 :alt="item.name"
               />
             </div>
-            <!-- Start -->
+            
+            <!-- Name Input + Label -->
             <div>
-              <label class="block text-sm font-medium mb-1 " :for="`name-${item.id}`"
-                >Nombre</label
-              >
+              <label class="block text-sm font-medium mb-1 " :for="`name-${item.id}`">
+                Nombre
+              </label>
+              <p class="text-xs text-red-500 font-medium italic mb-1 mt-2" for="name-create" :hidden="editErrors.name">
+                *  El nombre no puede estar vacío
+              </p>
+
               <input :id="`name-${item.id}`" class="form-input w-full" type="text" v-model="itemRef.name" />
             </div>
-            <!-- Start -->
+            
+            <!-- Mail Input + Label -->
             <div>
-              <label class="block text-sm font-medium mb-1 " :for="`email-${item.id}`"
-                >Correo</label
-              >
+              <label class="block text-sm font-medium mb-1 " :for="`email-${item.id}`">
+                Correo
+              </label>
+              <p class="text-xs text-red-500 font-medium italic mb-1 mt-2" for="name-create" :hidden="editErrors.mail">
+              *  El correo no es válido
+              </p>
+
               <input :id="`email-${item.id}`" class="form-input w-full" type="text" v-model="itemRef.email"/>
             </div>
 
-           
-            <!-- Start -->
+            <!-- Cellphone Input + Label -->
             <div>
-              <label class="block text-sm font-medium mb-1" :for="`cellphone-${item.id}`" 
-                >Celular</label
-              >
+              <label class="block text-sm font-medium mb-1" :for="`cellphone-${item.id}`" >
+                Celular
+              </label>
+              <p class="text-xs text-red-500 font-medium italic mb-1 mt-2" for="name-create" :hidden="editErrors.cellphone">
+              *  El nro. celular no es válido
+              </p>
               <input :id="`cellphone-${item.id}`" class="form-input w-full" type="text" v-model="itemRef.phoneNumber "/>
             </div>
-            <!-- Select -->
+
+            <!-- Role Select + Label -->
             <div v-if="item.role!='admin'">
               <label class="block text-sm font-medium mb-1" :for="`role-${item.id}`" 
                 >Rol</label
@@ -190,8 +224,14 @@
           </button>
           <button 
           @click="updateUser"
-          class="btn-sm bg-indigo-500 hover:bg-indigo-600 text-white">
-            Guardar
+          :disabled="!isNewUserValid || loading"
+          class="btn-sm disabled:bg-indigo-300 bg-indigo-500 hover:bg-indigo-600 text-white">
+            <span :hidden="loading">Guardar</span>
+            <span :hidden="!loading">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="animate-spin h-5 w-5 mx-5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
+              </svg>
+            </span>
           </button>
         </div>
       </div>
@@ -267,27 +307,46 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+//////////////////////////////////////////
+//Import Component Dependencies
+//////////////////////////////////////////
+
+//Vue + Components
+import { ref, watch } from "vue";
+import {useRouter,useRoute} from 'vue-router';
 import EditMenu from "../../components/DropdownEditMenu.vue";
 import ModalBasic from "../../components/ModalBasic.vue";
 import ModalBlank from '../../components/ModalBlank.vue'
-import {useRouter,useRoute} from 'vue-router';
-import DefaultImage from '../../images/user-avatar-80.png'
+
+//Composables
 import useResources from '../../composables/useResources'
 import useAdmins from "../../composables/useAdmins";
 import useAuth from "../../composables/useAuth";
+
+//Media
+import DefaultImage from '../../images/user-avatar-80.png'
+
+//////////////////////////////////////////
+//Variables + Refs Init
+//////////////////////////////////////////
+//Vue Related Init
+const props = defineProps(['item']);
+const router = useRouter();
+const route = useRoute();
+const emits = defineEmits(['edit-profile'])
+
+//Composables Init
+const {getImage} = useResources()
+const { editUser, loading} = useAuth();
+const {deleteUser, initializeAdmins} = useAdmins();
+
+//Refs Init
 const basicModalOpen = ref(false);
 const roleModalOpen = ref(false);
 const dangerModalOpen = ref(false);
-
 const previewImage = ref(DefaultImage);
 
-const router = useRouter();
-const route = useRoute();
-const {getImage} = useResources()
-const {deleteUser, initializeAdmins} = useAdmins();
-const { editUser} = useAuth();
-const props = defineProps(['item']);
+const isNewUserValid = ref(false);
 const itemRef = ref({
   name:props.item.name,
   email:props.item.email,
@@ -295,36 +354,118 @@ const itemRef = ref({
   profileImageUrl: props?.item?.profileImageUrl || '',
   imageUrl : props?.item?.imageUrl || []
 });
-
 const newUser = ref({
   
 })
+  //Edit Modal Errors
+const editErrors = ref({
+  imageFormat: true,
+  imageSize: true,
+  name: true,
+  mail: true,
+  cellphone: true,
+})
 
-
+//////////////////////////////////////////
+//Component Functionality 
+//////////////////////////////////////////
+//Core Actions - CRUD / Specific Actions
 const updateUser = async() => {
-  console.log(newUser.value.file)
   newUser.value.name = itemRef.value.name
   newUser.value.email = itemRef.value.email
   newUser.value.phoneNumber = itemRef.value.phoneNumber
   await editUser(newUser?.value, props?.item?.id);
-  router.push(route.path)
+
+  basicModalOpen.value = false;
+  emits('edit-profile');
+
+  await initializeAdmins();
 }
 
+const resetErrors = () => {
+  editErrors.value.imageFormat = false;
+  editErrors.value.imageSize = false;
+  editErrors.value.name = false;
+  editErrors.value.mail = false;
+  editErrors.value.cellphone = false;
+}
+
+const checkValidUser = () => {
+  isNewUserValid.value = false;
+
+  if(loading.value) {
+    isNewUserValid.value = false
+    return;
+  };
+
+  let valid = true;
+  Object.entries(editErrors.value).forEach(([key, value]) => {
+    if(!value && key != "imageFormat" && key != "imageSize") {
+      valid = false;
+      return;
+    }
+  });
+
+  if(valid) isNewUserValid.value = true;
+
+}
+
+// Edit Form Validation
+const phoneNumberRegex = /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/im;
+const emailRegex = /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/;
+watch(itemRef.value, (currentValue) => {
+    (currentValue.name.length > 0) ? editErrors.value.name = true : editErrors.value.name = false;
+    (phoneNumberRegex.exec(currentValue.phoneNumber)!=null) ? editErrors.value.cellphone = true : editErrors.value.cellphone = false;
+    (emailRegex.exec(currentValue.email)!=null) ? editErrors.value.mail = true : editErrors.value.mail = false;
+    checkValidUser();
+  }
+);
+
+
+//Utils - UI / Parsing / Any Other Un-Specific Component Action
 const clickInput = () => {
   let input = document.querySelector(`#image-input-${props.item.id}`)
   input.click();
 }
+
 const uploadImage = (e) => {
   const image = e.target.files[0];
+  if(e.target.files.length > 0)
+  {
+    let fileTokens = e.target.files[0]?.name.split(".");
+    let fileType = fileTokens[fileTokens.length-1];
+    let imageSize = e.target.files[0]?.size / 1000 /1000
+      
+    
+    if(fileType == "jpeg" || fileType == "jpg" || fileType == "jpe" || fileType == "png" || fileType == "jfif")
+    {
+      editErrors.value.imageFormat = true;
+      
+      if(imageSize < 1.5) {
+        editErrors.value.imageSize = true;  
+        newUser.value.file = e.target.files[0];
+        itemRef.value.profileImageUrl = null;
+        props.customer.profileImageUrl = null;
+        const reader = new FileReader();
+        reader.readAsDataURL(image);
+        reader.onload = e =>{
+          previewImage.value = e.target.result;
+        };
+      }  
+      else {
+        editErrors.value.imageSize = false;
+      }
+      
+    }
+    else {
+      editErrors.value.imageFormat = false;
+    }
+    
+  }
   
-  newUser.value.file = e.target.files[0]
-  console.log(newUser?.value.file)
-  itemRef.value.profileImageUrl = null;
-
-  const reader = new FileReader();
-  reader.readAsDataURL(image);
-  reader.onload = e =>{
-  previewImage.value = e.target.result;
-  };
 }
+
+
+
+
 </script>
