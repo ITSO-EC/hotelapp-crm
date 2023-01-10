@@ -1,3 +1,34 @@
+<script setup>
+//////////////////////////////////////////
+//Import Component Dependencies
+//////////////////////////////////////////
+//Vue + Components
+import { ref } from 'vue'
+import Sidebar from '../../partials/Sidebar.vue'
+import Header from '../../partials/Header.vue'
+import Toast from '../../components/Toast.vue'
+import DeleteButton from '../../partials/actions/DeleteButton.vue'
+import DateSelect from '../../components/DateSelect.vue'
+import FilterButton from '../../components/DropdownFilter.vue'
+import OrdersTable from '../../partials/orders/OrdersTable.vue'
+import PaginationClassic from '../../components/PaginationClassic.vue'
+
+//Composables
+import useOrders from "./../../composables/useRooftopOrders";
+
+//////////////////////////////////////////
+//Variables + Refs Init
+//////////////////////////////////////////
+
+//Composables Init
+const { orders, results, loading, error,createOrder} = useOrders();
+
+//Refs Init
+const sidebarOpen = ref(false);
+const succestoast = ref(false);
+const selectedStatus = ref("")
+
+</script>
 <template>
   <div class="flex h-screen overflow-hidden" :key="orders.length">
 
@@ -34,8 +65,64 @@
 
           </div>
 
+              <!-- Filter Actions -->
+          <div class="sm:flex sm:justify-between sm:items-center mb-5">
+            <!-- Left Side Filters -->
+            <div class="mb-4 sm:mb-0">
+                <ul class="flex flex-wrap -m-1">
+                    <li class="m-1">
+                        <button 
+                        @click="selectedStatus=''"
+                        :class="selectedStatus=='' ? 'border-transparent shadow-sm bg-indigo-500 text-white ' :'border-slate-200 hover:border-slate-300 shadow-sm bg-white text-slate-500'"
+                        class="inline-flex items-center justify-center 
+                        text-sm font-medium leading-5 rounded-full px-3 py-1 border 
+                        
+                        duration-150 ease-in-out">Todos</button>
+                    </li>
+                    <li class="m-1">
+                        <button 
+                        :class="selectedStatus=='status=success' ? 'border-transparent shadow-sm bg-indigo-500 text-white ' :'border-slate-200 hover:border-slate-300 shadow-sm bg-white text-slate-500'"
+                        
+                        @click="selectedStatus='status=success'" 
+                        class="inline-flex items-center justify-center 
+                        text-sm font-medium leading-5 rounded-full px-3 py-1 border
+                        
+                          duration-150 ease-in-out">Pendientes</button>
+                    </li>
+                    <li class="m-1">
+                        <button 
+                        @click="selectedStatus='status=pending'"
+                        :class="selectedStatus=='status=pending' ? 'border-transparent shadow-sm bg-indigo-500 text-white ' :'border-slate-200 hover:border-slate-300 shadow-sm bg-white text-slate-500'"
+                        
+                        class="inline-flex items-center justify-center 
+                        text-sm font-medium leading-5 rounded-full px-3 py-1 border
+                        duration-150 ease-in-out">Trabajando</button>
+                    </li>
+                    <li class="m-1">
+                        <button 
+                        @click="selectedStatus='status=finished'"
+                        :class="selectedStatus=='status=finished' ? 'border-transparent shadow-sm bg-indigo-500 text-white ' :'border-slate-200 hover:border-slate-300 shadow-sm bg-white text-slate-500'"
+                        
+                        class="inline-flex items-center justify-center 
+                        text-sm font-medium leading-5 rounded-full px-3 py-1 border
+                        duration-150 ease-in-out">Resueltos</button>
+                    </li>
+                    <li class="m-1">
+                        <button 
+                        @click="selectedStatus='status=rejected'"
+                        :class="selectedStatus=='status=rejected' ? 'border-transparent shadow-sm bg-indigo-500 text-white ' :'border-slate-200 hover:border-slate-300 shadow-sm bg-white text-slate-500'"
+                        
+                        class="inline-flex items-center justify-center 
+                        text-sm font-medium leading-5 rounded-full px-3 py-1 border 
+                        duration-150 ease-in-out">Cancelados</button>
+                    </li>
+                </ul>
+            </div>
+
+          </div>
+
           <!-- Table -->
-          <OrdersTable :rooftop="true"/>
+          <OrdersTable :rooftop="true" :status="selectedStatus" :key="selectedStatus"/>
 
           <!-- Pagination -->
           <div class="mt-8">
@@ -50,21 +137,3 @@
    
   </div>
 </template>
-
-<script setup>
-import { ref } from 'vue'
-import Sidebar from '../../partials/Sidebar.vue'
-import Header from '../../partials/Header.vue'
-import Toast from '../../components/Toast.vue'
-import DeleteButton from '../../partials/actions/DeleteButton.vue'
-import DateSelect from '../../components/DateSelect.vue'
-import FilterButton from '../../components/DropdownFilter.vue'
-import OrdersTable from '../../partials/orders/OrdersTable.vue'
-import PaginationClassic from '../../components/PaginationClassic.vue'
-import useOrders from "./../../composables/useRooftopOrders";
-
-const sidebarOpen = ref(false);
-const succestoast = ref(false);
-const { orders, results, loading, error,createOrder} = useOrders();
-
-</script>

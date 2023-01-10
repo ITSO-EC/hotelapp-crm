@@ -3,6 +3,7 @@ import { User } from '../interfaces/user'
 import { storeToRefs } from 'pinia';
 import { useAdminsStore } from '../stores/adminsStore'
 
+const COMMON_API='https://hotelapp.fastery.dev/v1/users?sortBy=updatedAt:desc'
 const BASE_API='https://hotelapp.fastery.dev/v1/'
 const useAdmins = () => {
     const adminsStore = useAdminsStore();
@@ -12,7 +13,7 @@ const useAdmins = () => {
     
     const initializeAdmins = async (page:number=1) => {
       loading.value = true;
-      adminsStore?.loadAdmins(await axios.get(BASE_API+'users?role=admin&page='+page));
+      adminsStore?.loadAdmins(await axios.get(COMMON_API+'&role=admin&page='+page));
       loading.value = false;
     }
     const nextPage = async (actualpage:number) => {

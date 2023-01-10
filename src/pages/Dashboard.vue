@@ -22,7 +22,7 @@
             
            <!-- Card (Recent Activity) -->
             <DashboardCard10 />
-            <DashboardCard04 />
+            <DashboardCard04 :review="review" :notreview="notReview" :key="review + notreview" />
             <!-- Claves -->
             <DashboardCard01 />
             <DashboardCardMenu/>
@@ -88,4 +88,10 @@ const sidebarOpen = ref(false)
 //destroyOrders()
 
 
+
+const BASE_API='https://hotelapp.fastery.dev/v1/'
+const review= ref(0);
+const notReview = ref(0);
+axios.get(BASE_API+'users?allowQualify=true').then((res)=> review.value = res.data.totalResults)  
+axios.get(BASE_API+'users?allowQualify=false').then((res)=> notReview.value = res.data.totalResults)
 </script>

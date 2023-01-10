@@ -1,6 +1,6 @@
+import axios from 'axios';
 import { defineStore, acceptHMRUpdate } from 'pinia';
 import { User } from '../interfaces/user';
-
 interface UsersState {
     users: User[];
     selectedUser: {};
@@ -29,7 +29,7 @@ export const useUsersStore = defineStore({
         getUserById(id: string) {
             this.selectedUser = this.users?.find((user) => user.id == id);
         },
-
+      
         loadUsers(data) {
            try {
                 this.users = data.data.results;

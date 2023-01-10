@@ -13,7 +13,7 @@
       <div class="text-center">{{customer.email}}</div>
     </td>
     <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
-      <div class=" font-medium text-sky-500">{{convertDate(customer.updatedAt)}}</div>
+      <div class=" font-medium text-sky-500">{{getCheckout(customer?.room?.number)}}</div>
     </td>
     <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
       <div class=" font-medium text-emerald-500">{{customer.room?.number || '---'  }}</div>
@@ -22,58 +22,75 @@
     <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap w-px">
       <!-- Menu button -->
       <EditMenu align="right" class="absolute -mt-4 -ml-4">
-            <li>
-              <button
-                class="
-                  font-medium
-                  text-sm text-slate-600
-                  hover:text-slate-800
-                  flex
-                  py-1
-                  px-3
-                "
+        <li>
+          <button
+            class="
+              font-medium
+              text-sm text-slate-600
+              hover:text-slate-800
+              flex
+              py-1
+              px-3
+            "
+          
+            @click.stop="basicModalOpen = true"
+            >Editar Cliente</button
+          >
+        </li>
+        
+        <li>
+          <button
+            class="
+              font-medium
+              text-sm text-slate-600
+              hover:text-slate-800
+              flex
+              py-1
+              px-3
               
-                @click.stop="basicModalOpen = true"
-                >Editar Cliente</button
-              >
-            </li>
-            <li v-if="customer.allowQualify"><button  
-              @click="editUser({allowQualify: false}, customer.id).then((res)=>initializeClients())"
-              class="
-                  font-medium
-                  text-sm text-rose-500
-                  hover:text-rose-600
-                  flex
-                  py-1
-                  px-3
-                ">Deshabilitar Review</button></li>
-            <li v-else  ><button 
-              @click="editUser({allowQualify: true}, customer.id).then((res)=>initializeClients())"
-              
-              class="
-                  font-medium
-                  text-sm text-emerald-500
-                  hover:text-emerald-600
-                  flex
-                  py-1
-                  px-3
-                "> Habilitar Review</button></li>
-            <li>
-              <button
-                class="
-                  font-medium
-                  text-sm text-rose-500
-                  hover:text-rose-600
-                  flex
-                  py-1
-                  px-3
-                "
-              
-                @click.stop="dangerModalOpen = true"
-                >Eliminar</button
-              >
-            </li>
-          </EditMenu>
+            "
+            @click="router.push('rooms')"
+            >Editar Checkout (WIP)</button
+          >
+        </li>
+        
+        <li v-if="customer.allowQualify"><button  
+          @click="editUser({allowQualify: false}, customer.id).then((res)=>initializeClients())"
+          class="
+              font-medium
+              text-sm text-rose-500
+              hover:text-rose-600
+              flex
+              py-1
+              px-3
+            ">Deshabilitar Review</button></li>
+        <li v-else  ><button 
+          @click="editUser({allowQualify: true}, customer.id).then((res)=>initializeClients())"
+          
+          class="
+              font-medium
+              text-sm text-emerald-500
+              hover:text-emerald-600
+              flex
+              py-1
+              px-3
+            "> Habilitar Review</button></li>
+        <li>
+          <button
+            class="
+              font-medium
+              text-sm text-rose-500
+              hover:text-rose-600
+              flex
+              py-1
+              px-3
+            "
+          
+            @click.stop="dangerModalOpen = true"
+            >Eliminar</button
+          >
+        </li>
+      </EditMenu>
     </td>
 
     <!-- Edit Customer -->
@@ -362,8 +379,10 @@ const editUserLocal = async () => {
 
 const getCheckout = (roomNumber) => {
   //Assuming rooms is not empty !!CORRECT  
-  const resultRoom = rooms.value.find(item => item.number == roomNumber);
 
+  if(roomNumber == "---") return "---";
+  const resultRoom = rooms?.value?.find(item => item.number == roomNumber);
+  return convertDate(resultRoom?.checkOutTime);
   //TODO - Get checkout time
 
 }

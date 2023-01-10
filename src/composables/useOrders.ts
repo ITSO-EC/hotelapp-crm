@@ -4,6 +4,7 @@ import { storeToRefs } from 'pinia';
 import { Order } from '../interfaces/order';
 import { useOrdersStore } from '../stores/ordersStore';
 
+const COMMON_API='https://hotelapp.fastery.dev/v1/orders?sortBy=createdAt:desc'
 const BASE_API='https://hotelapp.fastery.dev/v1/'
 
 const useOrders = () => {
@@ -13,18 +14,21 @@ const useOrders = () => {
     const {orders, selectedOrder,error, loading, results, page, pages} = storeToRefs(ordersStore);
 
 
-    const initializeAllOrders = async (page:number=1, silent:boolean=false) => {
+    const initializeAllOrders = async (page:number=1, silent:boolean=false, status:string="") => {
       loading.value = !silent;
-      ordersStore.loadOrders(await axios.get(BASE_API+'orders?populate=item,user&page='+page));  
+      ordersStore.loadOrders(await axios.get(COMMON_API+'&populate=item,user&page='+page+"&"+status));  
       loading.value = false;
     }
+
+
+    const retrieveRooftopOrders = async (page:number=1,silent:boolean=false, status:string="") => {
+      loading.value = !silent;
+      ordersStore.loadOrders(await axios.get(COMMON_API+'&item=63945f93c33e836efa9d3c7b&populate=item,user&page='+page + "&"+status));
+      loading.value = false;
+    }
+
     const retrieveOrdersByUser = async (userid:string,page:number=1) => {
       ordersStore.loadOrders(await axios.get(BASE_API+'orders?user='+ userid +'&page='+page)); 
-    }
-    const retrieveRooftopOrders = async (page:number=1,silent:boolean=false) => {
-      loading.value = !silent;
-      ordersStore.loadOrders(await axios.get(BASE_API+'orders?item=63945f93c33e836efa9d3c7b&populate=item,user&page='+page));
-      loading.value = false;
     }
 
     const nextPage = async (actualpage:number) => {

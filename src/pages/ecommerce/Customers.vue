@@ -1,3 +1,207 @@
+<script setup>
+//////////////////////////////////////////
+//Import Component Dependencies
+//////////////////////////////////////////
+
+//Vue + Components
+import { watch, ref } from 'vue';
+import { useRouter, useRoute } from 'vue-router';
+import Sidebar from '../../partials/Sidebar.vue';
+import Header from '../../partials/Header.vue';
+import ModalBasic from '../../components/ModalBasic.vue';
+import DeleteButton from '../../partials/actions/DeleteButton.vue';
+import DateSelect from '../../components/DateSelect.vue';
+import FilterButton from '../../components/DropdownFilter.vue';
+import CustomersTable from '../../partials/customers/CustomersTable.vue';
+import Toast from '../../components/Toast.vue';
+import PaginationClassic from '../../components/PaginationClassic.vue';
+
+//Composables
+import useRooms from "../../composables/useRooms";
+import useUsers from "../../composables/useUsers";
+import useResources from '../../composables/useResources'
+
+//Media
+import DefaultImage from '../../images/user-avatar-80.png'
+
+//////////////////////////////////////////
+//Variables + Refs Init
+//////////////////////////////////////////
+
+//Vue Related Init
+const router = useRouter();
+const route = useRoute();
+
+//Composables Init
+const {getImage} = useResources()
+const { users,results, error, initializeClients, createUser, loading,newUserId } = useUsers();
+const { rooms, initializeRooms, updateRoom } = useRooms();
+
+//Refs Init
+const sidebarOpen = ref(false)
+const confirmation = ref('')
+const succestoast = ref(false);    
+const registerModalOpen = ref(false)
+const previewImage = ref(DefaultImage);
+
+const isNewUserValid = ref(false);
+const newUser = ref({
+    name: '',
+    email: '',
+    password: '',
+    phoneNumber: '',
+    room: '63bb8cbf9955aa3847ba6e7c',
+    role: 'user',
+    allowQualify: true,
+})
+  //Register Modal Errors
+const registerErrors = ref({
+  imageFormat: true,
+  imageSize: true,
+  name: true,
+  mail: true,
+  cellphone: true,
+  password: true,
+  passwordValid: true,
+  passwordConfirm: true,
+})
+
+
+//////////////////////////////////////////
+//Component Functionality 
+//////////////////////////////////////////
+
+//Core Actions - CRUD / Specific Actions
+const createNewUser = async () => {
+  error.value = "";
+  succestoast.value = false;
+  let response = await createUser(newUser?.value);
+  registerModalOpen.value=false; 
+ 
+  //if(newUser.value.room) {
+    //let resultRoom = rooms.value.find((prevRoom)=>prevRoom.id == newUser.value.room);
+    //if(resultRoom) {
+      //let usersList = [...resultRoom.users];
+      //usersList.push(response?.data.id);
+      
+      //await updateRoom({users: usersList},resultRoom.id);
+  //Bug, proponer actualizar el modelo de Room desde el backend
+    //}
+   // }
+
+  resetData();
+  succestoast.value=true;
+  router.push(route.path);
+}
+
+const resetErrors = () => {
+  registerErrors.value.imageFormat = false;
+  registerErrors.value.imageSize = false;
+  registerErrors.value.name = false;
+  registerErrors.value.mail = false;
+  registerErrors.value.cellphone = false;
+  registerErrors.value.password = false;
+  registerErrors.value.passwordValid = false;
+  registerErrors.value.passwordConfirm = false;
+}
+
+const resetData = () => {
+  if(!error.value) {
+      previewImage.value = DefaultImage;
+
+      newUser.value.name= '';
+      newUser.value.email= '';
+      newUser.value.password= '';            
+      newUser.value.phoneNumber= '';
+      delete newUser.value.file;
+      newUser.value.role= 'user';
+      newUser.value.room= '63bb8cbf9955aa3847ba6e7c';
+      newUser.value.allowQualify= true;
+    
+    confirmation.value = ''
+    resetErrors();
+  }
+}
+
+const checkValidUser = () => {
+  isNewUserValid.value = false;
+
+  if(loading.value) {
+    isNewUserValid.value = false
+    return;
+  };
+
+  let valid = true;
+  Object.entries(registerErrors.value).forEach(([key, value]) => {
+    if(!value && key != "imageFormat" && key != "imageSize") {
+      valid = false;
+      return;
+    }
+  });
+
+  if(valid) isNewUserValid.value = true;
+
+}
+// Register Form Validation
+const phoneNumberRegex = /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/im;
+const emailRegex = /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/;
+watch([newUser.value, confirmation], ([currentValue, newConfirm]) => {
+    (currentValue.name.length > 0) ? registerErrors.value.name = true : registerErrors.value.name = false;
+    (phoneNumberRegex.exec(currentValue.phoneNumber)!=null) ? registerErrors.value.cellphone = true : registerErrors.value.cellphone = false;
+    (emailRegex.exec(currentValue.email)!=null) ? registerErrors.value.mail = true : registerErrors.value.mail = false;
+    (currentValue.password.length > 0) ? registerErrors.value.password = true : registerErrors.value.password = false; 
+    (currentValue.password.length > 5 || currentValue.password.length < 1) ? registerErrors.value.passwordValid = true : registerErrors.value.passwordValid = false;
+    (newConfirm == currentValue.password) ? registerErrors.value.passwordConfirm = true : registerErrors.value.passwordConfirm = false; 
+    checkValidUser();
+  }
+);
+
+//Utils - UI / Parsing / Any Other Un-Specific Component Action
+const clickInput = () => {
+  const input = document.querySelector('#image-input-create')
+  input.click();
+}
+
+const uploadImage = (e) => {
+  const image = e.target.files[0];
+  if(e.target.files.length > 0)
+  {
+    let fileTokens = e.target.files[0]?.name.split(".");
+    let fileType = fileTokens[fileTokens.length-1];
+    let imageSize = e.target.files[0]?.size / 1000 /1000
+      
+    
+    if(fileType == "jpeg" || fileType == "jpg" || fileType == "jpe" || fileType == "png" || fileType == "jfif")
+    {
+      registerErrors.value.imageFormat = true;
+      
+      if(imageSize < 1.5) {
+        registerErrors.value.imageSize = true;  
+        newUser.value.file = e.target.files[0];
+        const reader = new FileReader();
+        reader.readAsDataURL(image);
+        reader.onload = e =>{
+          previewImage.value = e.target.result;
+        };
+      }  
+      else {
+        registerErrors.value.imageSize = false;
+      }
+      
+    }
+    else {
+      registerErrors.value.imageFormat = false;
+    }
+    
+  }
+  
+}
+
+//Possible Required Hydration
+initializeClients();
+initializeRooms();
+    
+</script>
 <template>
   <!-- Page -->
   <div class="flex h-screen overflow-hidden">
@@ -219,207 +423,3 @@
   </div>
 </template>
 
-<script setup>
-//////////////////////////////////////////
-//Import Component Dependencies
-//////////////////////////////////////////
-
-//Vue + Components
-import { watch, ref } from 'vue';
-import { useRouter, useRoute } from 'vue-router';
-import Sidebar from '../../partials/Sidebar.vue';
-import Header from '../../partials/Header.vue';
-import ModalBasic from '../../components/ModalBasic.vue';
-import DeleteButton from '../../partials/actions/DeleteButton.vue';
-import DateSelect from '../../components/DateSelect.vue';
-import FilterButton from '../../components/DropdownFilter.vue';
-import CustomersTable from '../../partials/customers/CustomersTable.vue';
-import Toast from '../../components/Toast.vue';
-import PaginationClassic from '../../components/PaginationClassic.vue';
-
-//Composables
-import useRooms from "../../composables/useRooms";
-import useUsers from "../../composables/useUsers";
-import useResources from '../../composables/useResources'
-
-//Media
-import DefaultImage from '../../images/user-avatar-80.png'
-
-//////////////////////////////////////////
-//Variables + Refs Init
-//////////////////////////////////////////
-
-//Vue Related Init
-const router = useRouter();
-const route = useRoute();
-
-//Composables Init
-const {getImage} = useResources()
-const { users,results, error, initializeClients, createUser, loading,newUserId } = useUsers();
-const { rooms, initializeRooms, updateRoom } = useRooms();
-
-//Refs Init
-const sidebarOpen = ref(false)
-const confirmation = ref('')
-const succestoast = ref(false);    
-const registerModalOpen = ref(false)
-const previewImage = ref(DefaultImage);
-
-const isNewUserValid = ref(false);
-const newUser = ref({
-    name: '',
-    email: '',
-    password: '',
-    phoneNumber: '',
-    room: '63bb8cbf9955aa3847ba6e7c',
-    role: 'user',
-    allowQualify: true,
-})
-  //Register Modal Errors
-const registerErrors = ref({
-  imageFormat: true,
-  imageSize: true,
-  name: true,
-  mail: true,
-  cellphone: true,
-  password: true,
-  passwordValid: true,
-  passwordConfirm: true,
-})
-
-
-//////////////////////////////////////////
-//Component Functionality 
-//////////////////////////////////////////
-
-//Core Actions - CRUD / Specific Actions
-const createNewUser = async () => {
-  error.value = "";
-  succestoast.value = false;
-  let response = await createUser(newUser?.value);
-  registerModalOpen.value=false; 
- 
-  //if(newUser.value.room) {
-    //let resultRoom = rooms.value.find((prevRoom)=>prevRoom.id == newUser.value.room);
-    //if(resultRoom) {
-      //let usersList = [...resultRoom.users];
-      //usersList.push(response?.data.id);
-      
-      //await updateRoom({users: usersList},resultRoom.id);
-  //Bug, proponer actualizar el modelo de Room desde el backend
-    //}
-   // }
-
-  resetData();
-  succestoast.value=true;
-  router.push(route.path);
-}
-
-const resetErrors = () => {
-  registerErrors.value.imageFormat = false;
-  registerErrors.value.imageSize = false;
-  registerErrors.value.name = false;
-  registerErrors.value.mail = false;
-  registerErrors.value.cellphone = false;
-  registerErrors.value.password = false;
-  registerErrors.value.passwordValid = false;
-  registerErrors.value.passwordConfirm = false;
-}
-
-const resetData = () => {
-  if(!error.value) {
-      previewImage.value = DefaultImage;
-
-      newUser.value.name= '';
-      newUser.value.email= '';
-      newUser.value.password= '';            
-      newUser.value.phoneNumber= '';
-      delete newUser.value.file;
-      newUser.value.role= 'user';
-      newUser.value.room= '63bb8cbf9955aa3847ba6e7c';
-      newUser.value.allowQualify= true;
-    
-    confirmation.value = ''
-    resetErrors();
-  }
-}
-
-const checkValidUser = () => {
-  isNewUserValid.value = false;
-
-  if(loading.value) {
-    isNewUserValid.value = false
-    return;
-  };
-
-  let valid = true;
-  Object.entries(registerErrors.value).forEach(([key, value]) => {
-    if(!value && key != "imageFormat" && key != "imageSize") {
-      valid = false;
-      return;
-    }
-  });
-
-  if(valid) isNewUserValid.value = true;
-
-}
-// Register Form Validation
-const phoneNumberRegex = /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/im;
-const emailRegex = /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/;
-watch([newUser.value, confirmation], ([currentValue, newConfirm]) => {
-    (currentValue.name.length > 0) ? registerErrors.value.name = true : registerErrors.value.name = false;
-    (phoneNumberRegex.exec(currentValue.phoneNumber)!=null) ? registerErrors.value.cellphone = true : registerErrors.value.cellphone = false;
-    (emailRegex.exec(currentValue.email)!=null) ? registerErrors.value.mail = true : registerErrors.value.mail = false;
-    (currentValue.password.length > 0) ? registerErrors.value.password = true : registerErrors.value.password = false; 
-    (currentValue.password.length > 5 || currentValue.password.length < 1) ? registerErrors.value.passwordValid = true : registerErrors.value.passwordValid = false;
-    (newConfirm == currentValue.password) ? registerErrors.value.passwordConfirm = true : registerErrors.value.passwordConfirm = false; 
-    checkValidUser();
-  }
-);
-
-//Utils - UI / Parsing / Any Other Un-Specific Component Action
-const clickInput = () => {
-  const input = document.querySelector('#image-input-create')
-  input.click();
-}
-
-const uploadImage = (e) => {
-  const image = e.target.files[0];
-  if(e.target.files.length > 0)
-  {
-    let fileTokens = e.target.files[0]?.name.split(".");
-    let fileType = fileTokens[fileTokens.length-1];
-    let imageSize = e.target.files[0]?.size / 1000 /1000
-      
-    
-    if(fileType == "jpeg" || fileType == "jpg" || fileType == "jpe" || fileType == "png" || fileType == "jfif")
-    {
-      registerErrors.value.imageFormat = true;
-      
-      if(imageSize < 1.5) {
-        registerErrors.value.imageSize = true;  
-        newUser.value.file = e.target.files[0];
-        const reader = new FileReader();
-        reader.readAsDataURL(image);
-        reader.onload = e =>{
-          previewImage.value = e.target.result;
-        };
-      }  
-      else {
-        registerErrors.value.imageSize = false;
-      }
-      
-    }
-    else {
-      registerErrors.value.imageFormat = false;
-    }
-    
-  }
-  
-}
-
-//Possible Required Hydration
-initializeClients();
-initializeRooms();
-    
- </script>

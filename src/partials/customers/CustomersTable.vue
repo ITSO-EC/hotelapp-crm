@@ -23,7 +23,7 @@
                 <div class="font-semibold w-full">Serv. Hab.</div>
               </th>
               <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
-                <div class="font-semibold">Check-In</div>
+                <div class="font-semibold">Check-Out</div>
               </th>
               <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                 <div class="font-semibold">Habitacion</div>

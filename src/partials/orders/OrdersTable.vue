@@ -1,3 +1,74 @@
+
+<script setup>
+//////////////////////////////////////////
+//Import Component Dependencies
+//////////////////////////////////////////
+//Vue + Components
+import {ref,onMounted,onUnmounted} from 'vue'
+import { onBeforeRouteLeave, useRoute } from "vue-router";
+import Order from "./OrdersTableItem.vue";
+
+//Composables
+import useRooms from "../../composables/useRooms";
+import useOrders from "./../../composables/useOrders";
+import useUsers from "./../../composables/useUsers";  
+
+//////////////////////////////////////////
+//Variables + Refs Init
+//////////////////////////////////////////
+
+//Vue Related Init
+const route = useRoute();
+const props = defineProps({
+  rooftop: {
+    type: Boolean,
+    default: false
+  },
+  status: {
+    type: String,
+    default: ""
+  }
+});
+
+//Composables Init
+const {initializeRooms, rooms} = useRooms();
+const { orders,  initializeAllOrders, retrieveRooftopOrders, loading,results,page } = useOrders();
+
+//Refs Init
+const interval = ref(null);
+
+//////////////////////////////////////////
+//Component Functionality 
+//////////////////////////////////////////
+
+//Core Actions - CRUD / Specific Actions
+function initializeOrders(silent=false) {
+  if(!props.rooftop){
+  initializeAllOrders(page.value, silent, props.status);
+  }
+  else {
+    retrieveRooftopOrders(page.value, silent, props.status)
+  }
+
+}
+
+
+//Hooks
+onMounted(()=> {
+  initializeOrders();
+  initializeRooms();
+  interval.value =  setInterval(() => {
+      initializeOrders(true);
+  }, 3000);
+})
+
+
+onUnmounted(()=> {
+  
+  clearInterval(interval.value);
+})
+</script>
+
 <template>
   <div class="bg-white shadow-lg rounded-sm border border-slate-200 relative">
     <header class="px-5 py-4">
@@ -68,47 +139,3 @@
 
   </div>
 </template>
-
-<script setup>
-  import {ref,onMounted,onUnmounted} from 'vue'
-  import useRooms from "../../composables/useRooms";
-  import useOrders from "./../../composables/useOrders";
-  import useUsers from "./../../composables/useUsers";  
-  import Order from "./OrdersTableItem.vue";
-  import { onBeforeRouteLeave, useRoute } from "vue-router";
-
-  const {initializeRooms, rooms} = useRooms();
-  const { orders,  initializeAllOrders, retrieveRooftopOrders, loading,results,page } = useOrders();
-  const route = useRoute();
-  const props = defineProps({
-    rooftop: {
-      type: Boolean,
-      default: false
-    }
-  });
-  function initializeOrders(silent=false) {
-    if(!props.rooftop){
-    initializeAllOrders(page.value, silent);
-    }
-    else {
-      retrieveRooftopOrders(page.value, silent)
-    }
-
-  }
-  
-  const interval = ref(null);
-  onMounted(()=> {
-    initializeOrders();
-    initializeRooms();
-    interval.value =  setInterval(() => {
-        console.log("Silent updt")
-        initializeOrders(true);
-    }, 3000);
-  })
-
-  
-  onUnmounted(()=> {
-    console.log("Unmounted");
-    clearInterval(interval.value);
-  })
-</script>

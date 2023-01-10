@@ -4,7 +4,9 @@ import { storeToRefs } from 'pinia';
 import { useUsersStore } from '../stores/usersStore'
 import { ref } from 'vue';
 
-const BASE_API='https://hotelapp.fastery.dev/v1/'
+const COMMON_API='https://hotelapp.fastery.dev/v1/users?sortBy=updatedAt:desc';
+const BASE_API='https://hotelapp.fastery.dev/v1/';
+
 const useUsers = () => {
     const usersStore = useUsersStore();
     
@@ -13,13 +15,13 @@ const useUsers = () => {
 
     const initializeUsers = async (page:number=1) => {
         loading.value = true;
-        usersStore?.loadUsers(await axios.get(BASE_API+'users?populate=room&role=user&page='+page));
+        usersStore?.loadUsers(await axios.get(COMMON_API+'&populate=room&role=user&page='+page));
         loading.value = false;
     }
 
     const initializeClients = async (page:number=1) => {
       loading.value = true;
-      usersStore.loadUsers(await axios.get(BASE_API+'users?populate=room&role=user&page='+page));
+      usersStore.loadUsers(await axios.get(COMMON_API+'&populate=room&role=user&page='+page));
       loading.value = false;
     }
   
@@ -29,6 +31,8 @@ const useUsers = () => {
     const prevPage = async (actualpage:number) => {
       await initializeClients(actualpage-1);
     }
+
+   
 
     const selectUserById = (id: string) => usersStore.getUserById(id);
 

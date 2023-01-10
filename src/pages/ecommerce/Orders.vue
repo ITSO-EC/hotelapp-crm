@@ -1,3 +1,90 @@
+<script setup>
+//////////////////////////////////////////
+//Import Component Dependencies
+//////////////////////////////////////////
+//Vue + Components
+import { ref } from 'vue'
+import Sidebar from '../../partials/Sidebar.vue'
+import Header from '../../partials/Header.vue'
+import Toast from '../../components/Toast.vue'
+import DeleteButton from '../../partials/actions/DeleteButton.vue'
+import DateSelect from '../../components/DateSelect.vue'
+import FilterButton from '../../components/DropdownFilter.vue'
+import OrdersTable from '../../partials/orders/OrdersTable.vue'
+import PaginationClassic from '../../components/PaginationClassic.vue'
+import ModalBasic from "../../components/ModalBasic.vue";
+
+//Composables
+import useOrders from "./../../composables/useOrders";
+import useUsers from "../../composables/useUsers";
+
+//////////////////////////////////////////
+//Variables + Refs Init
+//////////////////////////////////////////
+
+//Composables Init
+const { orders, results, loading, error,createOrder,initializeAllOrders } = useOrders();
+const { users, selectedUser, initializeUsers} = useUsers();
+
+//Refs Init
+const sidebarOpen = ref(false)
+const orderModalOpen = ref(false);
+const succestoast = ref(false);
+const selectedStatus = ref("")
+
+const selectedFile = ref(null);
+const fileInput = ref(null);
+const form = ref(null);
+const newOrder = ref({
+  title: 'Titulo',
+  description: 'Una description',
+  price: 20,
+  user: '633e50cd1b2f918f140bea75',
+  type: 'subscribed',
+  file_url: ''
+})
+
+//Variables
+let formData = new FormData()
+
+
+//////////////////////////////////////////
+//Component Functionality 
+//////////////////////////////////////////
+
+//Core Actions - CRUD / Specific Actions
+function onSelectedFile() {
+  let file = fileInput.value.files;
+  if (file != null) {
+    let reader = new FileReader();
+    reader.onload = (e) => {
+      selectedFile.value = e.target.result;
+    };
+    
+    reader.readAsDataURL(file[0]);
+    
+    newOrder.value.file_url = file[0]
+
+  }
+}
+
+function resetFile() {
+    selectedFile.value = null;
+    newOrder.value = {
+      title: 'Titulo',
+      description: 'Una description',
+      price: 20,
+      user: '633e50cd1b2f918f140bea75',
+      type: 'subscribed',
+      file_url: ''
+    }
+    form.value.reset();
+}
+
+//Possible Required Hydration
+initializeUsers();
+
+</script>
 <template>
   <div class="flex h-screen overflow-hidden" :key="orders.length">
 
@@ -34,8 +121,66 @@
 
           </div>
 
-          <!-- Table -->
-          <OrdersTable />
+          <!-- Filter Actions -->
+          <div class="sm:flex sm:justify-between sm:items-center mb-5">
+
+            <!-- Left Side Filters -->
+            <div class="mb-4 sm:mb-0">
+                <ul class="flex flex-wrap -m-1">
+                    <li class="m-1">
+                        <button 
+                        @click="selectedStatus=''"
+                        :class="selectedStatus=='' ? 'border-transparent shadow-sm bg-indigo-500 text-white ' :'border-slate-200 hover:border-slate-300 shadow-sm bg-white text-slate-500'"
+                        class="inline-flex items-center justify-center 
+                        text-sm font-medium leading-5 rounded-full px-3 py-1 border 
+                        
+                        duration-150 ease-in-out">Todos</button>
+                    </li>
+                    <li class="m-1">
+                        <button 
+                        :class="selectedStatus=='status=success' ? 'border-transparent shadow-sm bg-indigo-500 text-white ' :'border-slate-200 hover:border-slate-300 shadow-sm bg-white text-slate-500'"
+                        
+                        @click="selectedStatus='status=success'" 
+                        class="inline-flex items-center justify-center 
+                        text-sm font-medium leading-5 rounded-full px-3 py-1 border
+                         
+                           duration-150 ease-in-out">Pendientes</button>
+                    </li>
+                    <li class="m-1">
+                        <button 
+                        @click="selectedStatus='status=pending'"
+                        :class="selectedStatus=='status=pending' ? 'border-transparent shadow-sm bg-indigo-500 text-white ' :'border-slate-200 hover:border-slate-300 shadow-sm bg-white text-slate-500'"
+                        
+                        class="inline-flex items-center justify-center 
+                        text-sm font-medium leading-5 rounded-full px-3 py-1 border
+                        duration-150 ease-in-out">Trabajando</button>
+                    </li>
+                    <li class="m-1">
+                        <button 
+                        @click="selectedStatus='status=finished'"
+                        :class="selectedStatus=='status=finished' ? 'border-transparent shadow-sm bg-indigo-500 text-white ' :'border-slate-200 hover:border-slate-300 shadow-sm bg-white text-slate-500'"
+                        
+                        class="inline-flex items-center justify-center 
+                        text-sm font-medium leading-5 rounded-full px-3 py-1 border
+                        duration-150 ease-in-out">Resueltos</button>
+                    </li>
+                    <li class="m-1">
+                        <button 
+                        @click="selectedStatus='status=rejected'"
+                        :class="selectedStatus=='status=rejected' ? 'border-transparent shadow-sm bg-indigo-500 text-white ' :'border-slate-200 hover:border-slate-300 shadow-sm bg-white text-slate-500'"
+                        
+                        class="inline-flex items-center justify-center 
+                        text-sm font-medium leading-5 rounded-full px-3 py-1 border 
+                        duration-150 ease-in-out">Cancelados</button>
+                    </li>
+                </ul>
+            </div>
+
+
+          </div>
+
+          <!-- Orders Table -->
+          <OrdersTable :status="selectedStatus" :key="selectedStatus"/>
 
           <!-- Pagination -->
           <div class="mt-8">
@@ -50,73 +195,3 @@
    
   </div>
 </template>
-
-<script setup>
-import { ref } from 'vue'
-import Sidebar from '../../partials/Sidebar.vue'
-import Header from '../../partials/Header.vue'
-import Toast from '../../components/Toast.vue'
-import DeleteButton from '../../partials/actions/DeleteButton.vue'
-import DateSelect from '../../components/DateSelect.vue'
-import FilterButton from '../../components/DropdownFilter.vue'
-import OrdersTable from '../../partials/orders/OrdersTable.vue'
-import PaginationClassic from '../../components/PaginationClassic.vue'
-
-import ModalBasic from "../../components/ModalBasic.vue";
-import useOrders from "./../../composables/useOrders";
-import useUsers from "../../composables/useUsers";
-
-const newOrder = ref({
-  title: 'Titulo',
-  description: 'Una description',
-  price: 20,
-  user: '633e50cd1b2f918f140bea75',
-  type: 'subscribed',
-  file_url: ''
-
-})
-const succestoast = ref(false);
-const { orders, results, loading, error,createOrder,initializeAllOrders } = useOrders();
-const { users, selectedUser, initializeUsers} = useUsers();
-
-const sidebarOpen = ref(false)
-const orderModalOpen = ref(false);
-
-const selectedFile = ref(null);
-const fileInput = ref(null);
-let formData = new FormData()
-
-const form = ref(null);
-
-initializeUsers();
-
-function onSelectedFile() {
-  let file = fileInput.value.files;
-  if (file != null) {
-    let reader = new FileReader();
-    reader.onload = (e) => {
-      selectedFile.value = e.target.result;
-    };
-    
-    reader.readAsDataURL(file[0]);
-    
-    newOrder.value.file_url = file[0]
-
-  }
-}
-
-
-function resetFile() {
-    selectedFile.value = null;
-    newOrder.value = {
-      title: 'Titulo',
-      description: 'Una description',
-      price: 20,
-      user: '633e50cd1b2f918f140bea75',
-      type: 'subscribed',
-      file_url: ''
-    }
-    form.value.reset();
-  }
-
-</script>

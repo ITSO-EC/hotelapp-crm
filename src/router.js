@@ -7,6 +7,7 @@ import RooftopOrders from './pages/ecommerce/RooftopOrders.vue'
 import axios from "axios";
 
 import UsersTabs from './pages/community/UsersTabs.vue'
+import HotelRooms from './pages/rooms/HotelRooms.vue'
 
 
 import Account from './pages/settings/Account.vue'
@@ -52,6 +53,11 @@ const router = createRouter({
     {
       path: '/community/users-tabs',
       component: UsersTabs
+    },
+    //Habitaciones
+    {
+      path: '/ecommerce/rooms',
+      component: HotelRooms
     },
 
 
