@@ -34,7 +34,7 @@ const route = useRoute();
 
 //Composables Init
 const {getImage} = useResources()
-const { users,results, error, initializeClients, createUser, loading,newUserId } = useUsers();
+const { users,results, error, initializeClients, createUser, loading,newUserId, page } = useUsers();
 const { rooms, initializeRooms, updateRoom } = useRooms();
 
 //Refs Init
@@ -276,7 +276,7 @@ initializeRooms();
          
           <!-- Pagination -->
           <div class="mt-8">
-            <PaginationClassic :items="users.length" :results="results" :type="'users'"/>
+            <PaginationClassic :items="users.length" :results="results" :localpage="page" :type="'users'"/>
           </div>          
 
         </div>

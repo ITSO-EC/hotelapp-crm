@@ -15,10 +15,10 @@
       <div class="grow p-5">
         <!-- Menu button -->
         <div class="relative">
-          <div v-if="getGuests(item?.number) == null" class="absolute top-0 left-0 inline-flex bg-green-500 text-slate-800 px-4 rounded-full shadow">
+          <div v-if="getGuests(item?.number) == null" class="absolute top-0 left-0 inline-flex bg-green-500 text-slate-800 font-bold px-4 rounded-full shadow">
             <span>Disponible</span>   
           </div>
-          <div v-else class="absolute top-0 left-0 inline-flex bg-red-500 text-slate-800 font-bold px-4 rounded-full shadow">
+          <div v-else class="absolute top-0 left-0 inline-flex bg-red-500 text-slate-50 font-bold px-4 rounded-full shadow">
             <span>No disponible</span>   
           </div>
 

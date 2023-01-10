@@ -53,15 +53,15 @@ import DashboardCard10 from '../partials/dashboard/DashboardCard10.vue'
 import axios from 'axios'
 
 
-//import usersFactory from '../factories/userFactory'
+import usersFactory from '../factories/userFactory'
 //import itemsFactory from '../factories/itemFactory'
 import ordersFactory from '../factories/orderFactory'
 //import roomsFactory from '../factories/roomFactory'
 
 const sidebarOpen = ref(false)
-//const {generateUsers,initializeUsers,destroyUsers} = usersFactory();
+const {generateUsers,initializeUsers,destroyUsers} = usersFactory();
 //const {generateItems,initializeItems,destroyItems} = itemsFactory();
-//const {generateOrders,initializeAllOrders,destroyOrders} = ordersFactory();
+const {generateOrders,initializeAllOrders,destroyOrders} = ordersFactory();
 //const {generateRooms,initializeRooms,destroyRooms} = roomsFactory();
 
 
@@ -84,7 +84,7 @@ const sidebarOpen = ref(false)
 //});
 
 //Genera Orders / Borra 
-//generateOrders(20);
+//generateOrders(12);
 //destroyOrders()
 
 

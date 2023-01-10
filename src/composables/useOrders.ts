@@ -14,10 +14,12 @@ const useOrders = () => {
     const {orders, selectedOrder,error, loading, results, page, pages} = storeToRefs(ordersStore);
 
 
-    const initializeAllOrders = async (page:number=1, silent:boolean=false, status:string="") => {
+    const initializeAllOrders = async (localpage:number=1, silent:boolean=false, status:string="") => {
+      console.log("Normal Orders")
       loading.value = !silent;
-      ordersStore.loadOrders(await axios.get(COMMON_API+'&populate=item,user&page='+page+"&"+status));  
-      loading.value = false;
+     
+      ordersStore.loadOrders(await axios.get(COMMON_API+'&populate=item,user&page='+localpage+"&"+status));  
+      if(!silent) loading.value = false;
     }
 
 

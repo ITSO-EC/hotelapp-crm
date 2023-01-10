@@ -6,15 +6,16 @@
       <span class="hidden xs:block ml-2">Añadir Foto</span>
     </button>
     <div  v-if="gallery?.length">
-      <button @click="prevPics(offset)" 
-      :disabled="start<=0"
-      :class="start<= 0? 'btn bg-white border border-slate-200 text-slate-300' : 'btn bg-white border-slate-200 hover:border-slate-308 text-indigo-500'"
+      <button @click="prevPics(offset); log()" 
+      :disabled="page==0"
+      :class="page==0? 'btn bg-white border border-slate-200 text-slate-300' : 'btn bg-white border-slate-200 hover:border-slate-308 text-indigo-500'"
       
-      class="btn bg-white border border-slate-200 text-slate-300"><span class="sr-only">Anterior</span><wbr><svg class="h-4 w-4 fill-current" viewBox="0 0 16 16"><path d="M9.4 13.4l1.4-1.4-4-4 4-4-1.4-1.4L4 8z"></path></svg></button>
-      <span class="mx-4">{{finish < gallery.length? finish: gallery.length}} de {{gallery.length}}</span>
-      <button @click="nextPics(offset)" 
-      :disabled="finish>=gallery.length"
-      :class="finish >= gallery.length? 'btn bg-white border border-slate-200 text-slate-300' : 'btn bg-white border-slate-200 hover:border-slate-308 text-indigo-500'"
+       ><span class="sr-only">Anterior</span><wbr><svg class="h-4 w-4 fill-current" viewBox="0 0 16 16"><path d="M9.4 13.4l1.4-1.4-4-4 4-4-1.4-1.4L4 8z"></path></svg>
+      </button>
+      <span class="mx-4">{{finish < gallery.length? finish : gallery.length}} de {{gallery.length}}</span>
+      <button @click="nextPics(offset); log()" 
+      :disabled="page+1 >= limit"
+      :class="page+1 >= limit? 'btn bg-white border border-slate-200 text-slate-300' : 'btn bg-white border-slate-200 hover:border-slate-308 text-indigo-500'"
       class="">
         <span class="sr-only">Siguiente</span>
         <wbr>
@@ -151,82 +152,103 @@
 </template>
 
 <script setup>
+//////////////////////////////////////////
+//Import Component Dependencies
+//////////////////////////////////////////
+
+//Vue + Components
 import {ref} from 'vue'
-import useResources from '../../composables/useResources';
 import ModalBlank from '../../components/ModalBlank.vue'
 import ModalBasic from '../../components/ModalBasic.vue'
-import useUsers from '../../composables/useUsers';
 import{ defineProps }from 'vue'
-import DefaultImage from '../../images/user-avatar-80.png'
 import BaseIcon from '../../components/BaseIcon.vue';
 
+//Composables
+import useResources from '../../composables/useResources';
+import useUsers from '../../composables/useUsers';
+
+//Media
+import DefaultImage from '../../images/user-avatar-80.png'
+
+//////////////////////////////////////////
+//Variables + Refs Init
+//////////////////////////////////////////
+
+//Vue Related Init
+const props = defineProps(['gallery', 'userid']) //user=>id
+
+//Composables Init
+const {getImage} = useResources();
+const {addImage, deleteImage} = useUsers();
+
+//Refs Init
 const previewImage = ref(DefaultImage);
 const basicGalleryModalOpen = ref(false);
 const dangerGalleryModalOpen = ref(false);
 const selectedPicture = ref([])
-const props = defineProps(['gallery', 'userid']) //user=>id
-const {getImage} = useResources();
-const {addImage, deleteImage} = useUsers();
-
-const offset = ref(4);
-const page = ref(0);
-const start = ref(0);
-const finish = ref(4);
-const nextButton = ref(true);
-const prevButton = ref(false);
-const galleryUser = ref(props?.gallery?.slice(0,4))
-const nextPics = (amount) => {
-    let galleryArray = props?.gallery;
-    let limit = Math.ceil(galleryArray.length / offset.value);
-
-    if((page.value + 2) < limit)
-    {
-      page.value++;
-      start.value += offset.value *(page.value)
-      finish.value += offset.value *(page.value)
-      galleryUser.value = galleryArray.slice(start.value, finish.value);
-    }
-    else
-    {
-      if(finish.value + (galleryArray.length % offset.value) < galleryArray.length+1){
-        start.value += (galleryArray.length % offset.value);
-        finish.value += (galleryArray.length % offset.value);
-        galleryUser.value = galleryArray.slice(start.value, finish.value);
-      }
-    }
-      
-}
-
-
-
-const prevPics = (amount) => {
-  let galleryArray = props?.gallery;
-    let limit = Math.ceil(galleryArray.length / offset.value);
-
-    if(start.value - (offset.value * (limit-page.value)) >= 0)
-    {
-      limit--;
-      start.value -= offset.value *(limit-page.value)
-      finish.value -= offset.value *(limit-page.value)
-      galleryUser.value = galleryArray.slice(start.value, finish.value);
-      
-      page.value--;
-    }
-    else
-    {
-      if(start.value -  (galleryArray.length % offset.value)  >= 0)
-      {
-        start.value -= (galleryArray.length % offset.value);
-        finish.value -= (galleryArray.length % offset.value);
-        galleryUser.value = galleryArray.slice(start.value, finish.value);
-      }
-    }
-}
-
-
 const newPic =  ref({
   file:''
 })
+
+/////////////////////////////////////////////////////////////////////
+//GALLERY LOGIC
+//////////////////////////////
+
+//Paginator Info
+const offset = ref(4);
+const page = ref(0);
+const limit = ref(Math.ceil(props?.gallery?.length / offset.value));
+    //Visual page limit 
+  // Page 1   -  Page 2   ...    Page 5   -   Page 6
+  //(4 of 22) , (8 of 22) ...  (20 of 22)  , (22 of 22)  
+    
+
+//Visible Limits
+const start = ref(0);
+const finish = ref(4);
+
+const nextButton = ref(true);
+const prevButton = ref(false);
+
+const galleryUser = ref(props?.gallery?.slice(0,4))
+const nextPics = (amount) => {
+    //All user pics
+    let galleryArray = props?.gallery;
+    
+
+    if((page.value + 1) < limit.value)
+    {
+      page.value = page.value + 1;
+      start.value = offset.value *(page.value)
+      finish.value = 4 + offset.value *(page.value)
+      galleryUser.value = galleryArray.slice(start.value, finish.value);
+    }
+    
+      
+}
+
+const log = () => {
+  console.log("Total: ", props?.gallery?.length)
+  console.log(`Page: ${page.value} / ${limit.value -1}`)
+  console.log("Visible: ", start.value ,"of" , finish.value)
+
+}
+
+const prevPics = (amount) => {
+  let galleryArray = props?.gallery;
+    if(page.value > 0)
+    {
+      page.value = page.value - 1;
+      start.value = offset.value *(page.value)
+      finish.value = 4 + offset.value *(page.value)
+
+      galleryUser.value = galleryArray.slice(start.value, finish.value);
+    }
+   
+}
+///////////////////////////////
+//END OF GALLERY
+////////////////////////////////////////////////////////////////////
 const clickInput = (e) => {
   const input = document.querySelector(`#gallery-input-${props?.userid}`)
   input.addEventListener('click', event=>{
@@ -234,7 +256,6 @@ const clickInput = (e) => {
   })
   input.click();
 }
-
 const uploadImage = (e) => {
   const image = e.target.files[0];
   previewImage.value= e.target.files[0];

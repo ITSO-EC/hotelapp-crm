@@ -3,30 +3,34 @@
 //Import Component Dependencies
 //////////////////////////////////////////
 //Vue + Components
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import Sidebar from '../../partials/Sidebar.vue'
 import Header from '../../partials/Header.vue'
 import Toast from '../../components/Toast.vue'
 import DeleteButton from '../../partials/actions/DeleteButton.vue'
 import DateSelect from '../../components/DateSelect.vue'
 import FilterButton from '../../components/DropdownFilter.vue'
-import OrdersTable from '../../partials/orders/OrdersTable.vue'
+import RooftopOrdersTable from '../../partials/orders/RooftopOrdersTable.vue'
 import PaginationClassic from '../../components/PaginationClassic.vue'
 
 //Composables
-import useOrders from "./../../composables/useRooftopOrders";
+import useRooftopOrders from "./../../composables/useRooftopOrders";
 
 //////////////////////////////////////////
 //Variables + Refs Init
 //////////////////////////////////////////
 
 //Composables Init
-const { orders, results, loading, error,createOrder} = useOrders();
+const { orders, results, loading, error,createOrder,page,pages} = useRooftopOrders();
 
 //Refs Init
 const sidebarOpen = ref(false);
 const succestoast = ref(false);
 const selectedStatus = ref("")
+
+watch(selectedStatus, (currentStatus) => {
+  page.value = 1;
+})
 
 </script>
 <template>
@@ -122,11 +126,12 @@ const selectedStatus = ref("")
           </div>
 
           <!-- Table -->
-          <OrdersTable :rooftop="true" :status="selectedStatus" :key="selectedStatus"/>
+          <RooftopOrdersTable :rooftop="true" :status="selectedStatus" :key="selectedStatus"/>
 
           <!-- Pagination -->
           <div class="mt-8">
-            <PaginationClassic :items="orders.length" :results="results" :type="'orders'"/>
+           
+            <PaginationClassic :items="orders.length" :results="results" :type="'rooftop'" :localpage="page" key="`${page}`"/>
           </div>
 
         </div>

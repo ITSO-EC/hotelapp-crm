@@ -50,7 +50,7 @@
               
             "
             @click="router.push('rooms')"
-            >Editar Checkout (WIP)</button
+            >Editar Checkout</button
           >
         </li>
         

@@ -3,7 +3,7 @@
 //Import Component Dependencies
 //////////////////////////////////////////
 //Vue + Components
-import { ref } from 'vue'
+import { ref,watch } from 'vue'
 import Sidebar from '../../partials/Sidebar.vue'
 import Header from '../../partials/Header.vue'
 import Toast from '../../components/Toast.vue'
@@ -23,7 +23,7 @@ import useUsers from "../../composables/useUsers";
 //////////////////////////////////////////
 
 //Composables Init
-const { orders, results, loading, error,createOrder,initializeAllOrders } = useOrders();
+const { orders, results, loading, error,createOrder, page, pages } = useOrders();
 const { users, selectedUser, initializeUsers} = useUsers();
 
 //Refs Init
@@ -31,6 +31,11 @@ const sidebarOpen = ref(false)
 const orderModalOpen = ref(false);
 const succestoast = ref(false);
 const selectedStatus = ref("")
+
+
+watch(selectedStatus, (currentStatus) => {
+  page.value = 1;
+})
 
 const selectedFile = ref(null);
 const fileInput = ref(null);
@@ -184,7 +189,8 @@ initializeUsers();
 
           <!-- Pagination -->
           <div class="mt-8">
-            <PaginationClassic :items="orders.length" :results="results" :type="'orders'"/>
+          
+            <PaginationClassic :items="orders.length" :results="results" :type="'orders'" :localpage="page" :key="page"/>
           </div>
 
         </div>

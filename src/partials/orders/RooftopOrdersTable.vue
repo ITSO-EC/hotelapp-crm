@@ -10,7 +10,8 @@ import Order from "./OrdersTableItem.vue";
 
 //Composables
 import useRooms from "../../composables/useRooms";
-import useOrders from "./../../composables/useOrders";
+import useRooftopOrders from "./../../composables/useRooftopOrders";
+
 import useUsers from "./../../composables/useUsers";  
 
 //////////////////////////////////////////
@@ -32,7 +33,7 @@ const props = defineProps({
 
 //Composables Init
 const {initializeRooms, rooms} = useRooms();
-const { orders,  initializeAllOrders, retrieveRooftopOrders, loading,results,page } =  useOrders();
+const { orders,  initializeAllOrders, retrieveRooftopOrders, loading,results,page } =  useRooftopOrders() ;
 
 //Refs Init
 const interval = ref(null);

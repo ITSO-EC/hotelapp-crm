@@ -39,7 +39,7 @@ const ordersFactory = () => {
     
     function createRandomOrder(): Order {
         return {
-           item: items?.value[faker.datatype.number(items.value.length-1)]?.id || "",
+           item: '63945f93c33e836efa9d3c7b',//items?.value[faker.datatype.number(items.value.length-1)]?.id || "",
            user: users?.value[faker.datatype.number(users.value.length-1)]?.id || "",
            status: faker.helpers.arrayElement(['success','pending','finished','rejected']),
         };

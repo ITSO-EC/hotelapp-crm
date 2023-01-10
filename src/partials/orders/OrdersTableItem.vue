@@ -1,7 +1,6 @@
 <template>
-  <tbody class="text-sm ">
     <!-- Row -->
-    <tr class="first:text-left last:text-right text-center">
+    <tr class="">
      
       <td class="first:pl-5 last:pr-5 px-2 py-3 whitespace-nowrap hidden md:table-cell">
           
@@ -77,8 +76,7 @@
         </div>
       </td>
     </tr>
-  </tbody>
-</template>
+  </template>
 <script setup>
   import useOrders from "../../composables/useOrders";
   import getImage from "../../composables/useResources"
