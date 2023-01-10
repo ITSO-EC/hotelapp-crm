@@ -38,8 +38,9 @@
 
           </div>
 
-          
-
+          <div class="grid grid-cols-12 gap-6">
+            <RoomTabs v-for="(room,i) in rooms" :key="i" :item="room" ></RoomTabs>
+          </div>
         </div>
       </main>
 
@@ -58,7 +59,7 @@
 import { ref,watch } from 'vue'
 import Sidebar from '../../partials/Sidebar.vue'
 import Header from '../../partials/Header.vue'
-import UsersTabsCard from '../../partials/community/UsersTabsCard.vue'
+import RoomTabs from '../../partials/ecommerce/RoomTabs.vue'
 import PaginationNumeric from '../../components/PaginationNumeric.vue'
 import ModalBasic from '../../components/ModalBasic.vue'
 import Toast from '../../components/Toast.vue'
@@ -90,8 +91,43 @@ const registerModalOpen = ref(false);
 const previewImage = ref(DefaultImage);
 const rooms = ref([
   {
-    name: "Hab.1",
-    description: "2 Camas",
+    name: "Hab. Doble Superior",
+    image:"https://friendsquito.com/wp-content/uploads/2022/07/FRIENDS-40.jpg",
+    description: "Para 1 ó 2 personas",
+    number: 112,
+
+  } ,
+  {
+    name: "Doble Superior con Balcón",
+    image: "https://friendsquito.com/wp-content/uploads/2022/07/FRIENDS-29.jpg",
+    description: "Para 1 ó 2 personas",
+    number: 113,
+  }, 
+  {
+    name: "Hab. Doble Twin",
+    image:"https://friendsquito.com/wp-content/uploads/2022/03/DOBLESUP.jpg",
+    description: "Para 2 ó 3 personas",
+    number: 112,
+
+
+  }, {
+    name: "Hab. Triple",
+    image:"https://friendsquito.com/wp-content/uploads/2022/07/FRIENDS-35.jpg",
+    description: "Para 3 ó 4 personas",
+    number: 112,
+
+
+  } ,
+  {
+    name: "Hab. Doble Estándar",
+    image: "https://friendsquito.com/wp-content/uploads/2021/06/FRIENDS-9.jpg",
+    description: "Para 1 ó 2 personas",
+    number: 113,
+  }, 
+  {
+    name: "Departamento con Cocina",
+    image:"https://friendsquito.com/wp-content/uploads/2021/06/FRIENDS-27-1.jpg",
+    description: "Para 2 ó 4 personas",
     number: 112,
 
 
