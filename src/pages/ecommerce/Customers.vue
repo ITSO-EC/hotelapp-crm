@@ -73,11 +73,28 @@ const registerErrors = ref({
 
 //Core Actions - CRUD / Specific Actions
 const createNewUser = async () => {
+  if(!rooms.value) await initializeRooms();
+
   error.value = "";
   succestoast.value = false;
   let response = await createUser(newUser?.value);
+  
   registerModalOpen.value=false; 
  
+  
+  //Set new room
+  if(newUser.value.room) {
+    let resultRoom = rooms.value.find((roomsel)=>roomsel.id == newUser.value.room);
+    if(resultRoom)
+    {
+      let usersList = 
+      resultRoom.users.map((currentUser)=> currentUser.id );
+      if(!usersList.includes(response?.data?.id)) usersList.push(response?.data?.id);
+      
+      await updateRoom({users: usersList},resultRoom.id);
+  
+    }
+  }
   //if(newUser.value.room) {
     //let resultRoom = rooms.value.find((prevRoom)=>prevRoom.id == newUser.value.room);
     //if(resultRoom) {

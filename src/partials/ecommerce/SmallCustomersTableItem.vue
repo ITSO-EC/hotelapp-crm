@@ -2,21 +2,16 @@
   <tr :key="customer.id" class="text-center">
     
     <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
-      <div class="first:text-left">{{customer.name}}</div>
+      <div class="first:text-left">{{ customer?.name }}</div>
     </td>
   
     <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
-      <div class="">{{customer.phoneNumber || '---'}}</div>
+      <div class="">{{ customer?.phoneNumber  }}</div>
     </td>
    
+    
     <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
-      <div class="text-center">{{customer.email}}</div>
-    </td>
-    <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
-      <div class=" font-medium text-sky-500">{{getCheckout(customer?.room?.number)}}</div>
-    </td>
-    <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
-      <div class=" font-medium text-emerald-500">{{customer.room?.number || '---'  }}</div>
+      <div class=" font-medium text-emerald-500"></div>
     </td>
     
     <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap w-px">
@@ -34,62 +29,11 @@
             "
           
             @click.stop="basicModalOpen = true"
-            >Editar Cliente</button
+            >Cambiar Habitación</button
           >
         </li>
         
-        <li>
-          <button
-            class="
-              font-medium
-              text-sm text-slate-600
-              hover:text-slate-800
-              flex
-              py-1
-              px-3
-              
-            "
-            @click="router.push('rooms')"
-            >Editar Checkout (WIP)</button
-          >
-        </li>
         
-        <li v-if="customer.allowQualify"><button  
-          @click="editUser({allowQualify: false}, customer.id).then((res)=>initializeClients())"
-          class="
-              font-medium
-              text-sm text-rose-500
-              hover:text-rose-600
-              flex
-              py-1
-              px-3
-            ">Deshabilitar Review</button></li>
-        <li v-else  ><button 
-          @click="editUser({allowQualify: true}, customer.id).then((res)=>initializeClients())"
-          
-          class="
-              font-medium
-              text-sm text-emerald-500
-              hover:text-emerald-600
-              flex
-              py-1
-              px-3
-            "> Habilitar Review</button></li>
-        <li>
-          <button
-            class="
-              font-medium
-              text-sm text-rose-500
-              hover:text-rose-600
-              flex
-              py-1
-              px-3
-            "
-          
-            @click.stop="dangerModalOpen = true"
-            >Eliminar</button
-          >
-        </li>
       </EditMenu>
     </td>
 
@@ -103,33 +47,23 @@
       <div class="px-5 pt-4 pb-1">
         <div class="text-sm">
           <div class="font-medium text-slate-800 mb-2">
-            Haga click sobre el círculo y elija una foto de perfil.
+            {{ customer.name }}
           </div>
 
           <!-- Form Start -->
           <div class="space-y-2 grid grid-cols-1 sm:grid-cols-2 gap-4">
 
-             <!-- Image - Error Messages -->
-            <div class="flex flex-col">
-              <p class="text-xs text-red-500 font-medium italic mt-2" for="name-create" :hidden="editErrors.imageFormat">
-              *  El formato de Imagen no es permitido (Solo "jpg", "png" o "jpeg")
-              </p>
-              <p class="text-xs text-red-500 font-medium italic mb-1" for="name-create" :hidden="editErrors.imageSize">
-              *  Imagen muy pesada (Máx. 1.5MB)
-              </p>
-              
-            </div>
+        
           
             <!-- Profile Pic - Image Chooser -->  
             <div class="flex justify-center sm:col-span-2">
               <input :id="`image-input-edit-${customer.id}`" class="hidden" accept="image/jpeg, image/png, image/jpg" type="file" @change="uploadImage">
           
               <img
-                @click="clickInput"
                 class="rounded-full 
                 w-[64px]
                 h-[64px]
-                cursor-pointer hover:grayscale ease-in-out duration-300 active:grayscale-0"
+                ease-in-out duration-300 "
                 :src="customer.profileImageUrl? `${getImage(customer.profileImageUrl)}`: `${previewImage}`"
                 width="64"
                 height="64"
@@ -137,40 +71,11 @@
               />
             </div>
 
-            <!-- Name Input + Label -->
-            <div class="mt-2">
-              <label class="block text-sm font-medium mb-1 " :for="`name-${customer.id}`"
-                >Nombre</label>  
-              <p class="text-xs text-red-500 font-medium italic mb-1 mt-2" for="name-create" :hidden="editErrors.name">
-              *  El nombre no puede estar vacío
-              
-              </p>
-              <input :id="`name-${customer.id}`" class="form-input w-full" type="text" v-model="newUser.name" />
-            </div>
-
-            <!-- Mail Input + Label -->
-            <div>
-              <label class="block text-sm font-medium mb-1 " :for="`email-${customer.id}`"
-                >Correo</label>  
-              <p class="text-xs text-red-500 font-medium italic mb-1 mt-2" for="name-create" :hidden="editErrors.mail">
-              *  El correo no es válido
-              </p>
-              <input :id="`email-${customer.id}`" class="form-input w-full" type="text" v-model="newUser.email" />
-            </div>
-
-            <!-- Cellphone Input + Label -->
-            <div>
-              <label class="block text-sm font-medium mb-1 " :for="`cellphone-${customer.id}`"
-                >Celular</label
-              >  
-              <p class="text-xs text-red-500 font-medium italic mb-1 mt-2" for="name-create" :hidden="editErrors.cellphone">
-              *  El nro. celular no es válido
-              </p>
-              <input :id="`cellphone-${customer.id}`" class="form-input w-full" type="text" v-model="newUser.phoneNumber" />
-            </div>
+            
+         
             
             <!-- Room Select + Label -->
-            <div v-if="rooms">
+            <div v-if="rooms" class="sm:col-span-2">
               <label class="block text-sm font-medium mb-1" :for="`room-${customer.id}`" 
                 >Habitación</label
               >
@@ -181,14 +86,7 @@
               </select>
             </div>
 
-            <!-- Gallery -->
-            <div class="sm:col-span-2 h-fit">
-              <label class="block text-sm font-medium mb-1 h-12" :for="`gallery-${customer.id}`"
-                >Galería</label
-              >
-              <ViewPictures :gallery="customer.imageUrl" :userid="customer.id"></ViewPictures>
-            </div>
-
+          
           </div>
         </div>
       </div>
@@ -252,13 +150,13 @@
           <!-- Modal header -->
           <div class="mb-2">
             <div class="text-lg font-semibold text-slate-800">
-              ¿Está seguro que desea eliminar este cliente?
+              ¿Está seguro que desea retirar al huésped de esta habitación?
             </div>
           </div>
           <!-- Modal content -->
           <div class="text-sm mb-10">
             <div class="space-y-2">
-              <p>Considere que esta acción es irreversible.</p>
+              <p>Considere que deberá reasignarlo luego.</p>
             </div>
           </div>
           <!-- Modal footer -->
@@ -274,8 +172,8 @@
             >
               Cancelar
             </button>
-            <button @click.stop="deleteUser(customer.id); dangerModalOpen = false" class="btn-sm bg-rose-500 hover:bg-rose-600 text-white">
-              Si, eliminar
+            <button @click.stop=" dangerModalOpen = false" class="btn-sm bg-rose-500 hover:bg-rose-600 text-white">
+              Si, retíralo
             </button>
           </div>
         </div>
@@ -293,7 +191,7 @@
 import { defineProps, watch, ref } from 'vue';
 import { useRouter, useRoute } from 'vue-router'
 import EditMenu from "../../components/DropdownEditMenu.vue";
-import ViewPictures from './ViewPictures.vue'
+import ViewPictures from '../customers/ViewPictures.vue'
 import ModalBasic from "../../components/ModalBasic.vue";
 import ModalBlank from '../../components/ModalBlank.vue'
 
@@ -332,7 +230,7 @@ const isNewUserValid = ref(false);
 const newUser = ref({
   name: props.customer?.name,
   email: props.customer?.email,
-  room: props.customer?.room?.id,
+  room: props.customer?.room,
   phoneNumber: props.customer?.phoneNumber,
   // notificationApp: props.customer.notificationApp,
   // notificationEmail: props.customer.notificationEmail,
@@ -357,11 +255,10 @@ const editErrors = ref({
 //Core Actions - CRUD / Specific Actions
 const editUserLocal = async () => {
   if(!rooms.value) await initializeRooms();
-
+  
   //Remove previous room
-  if (props?.customer?.room) {
-    
-    let resultRoom = rooms.value.find((roomsel)=>roomsel.id == props?.customer?.room.id);
+  if (props.customer.room) {
+    let resultRoom = rooms.value.find((roomsel)=>roomsel.id == props?.customer?.room);
     if(resultRoom)
     {
       let usersList = 
@@ -372,22 +269,20 @@ const editUserLocal = async () => {
     }
   }
 
-
   await editUser(newUser.value, props?.customer?.id)
-
+  
   //Set new room
   if(newUser.value.room) {
-    let resultRoom = rooms.value.find((roomsel)=>roomsel.id == newUser.value.room);
-    if(resultRoom)
-    {
-      let usersList = 
-      resultRoom.users.map((currentUser)=> currentUser.id );
-      if(!usersList.includes(props?.customer?.id)) usersList.push(props?.customer?.id);
-      
-      await updateRoom({users: usersList},resultRoom.id);
-  
+      let resultRoom = rooms.value.find((roomsel)=>roomsel.id == newUser.value.room);
+      if(resultRoom)
+      {
+        let usersList = 
+        resultRoom.users.map((currentUser)=> currentUser.id );
+        if(!usersList.includes(props?.customer?.id)) usersList.push(props?.customer?.id);
+        await updateRoom({users: usersList},resultRoom.id);
+    
+      }
     }
-  }
   
   basicModalOpen.value = false;
   emits('edit-customer');
@@ -456,45 +351,4 @@ const convertDate = (date) => {
   if(dd<10){dd='0'+dd} 
   return date = dd+'-'+monthNames[mm]+'-'+yyyy
 }
-const clickInput = () => {
-  const input = document.querySelector(`#image-input-edit-${props.customer.id}`)
-  console.log(props.customer.id)
-  input.click();
-} 
-const uploadImage = (e) => {
-  const image = e.target.files[0];
-  if(e.target.files.length > 0)
-  {
-    let fileTokens = e.target.files[0]?.name.split(".");
-    let fileType = fileTokens[fileTokens.length-1];
-    let imageSize = e.target.files[0]?.size / 1000 /1000
-      
-    
-    if(fileType == "jpeg" || fileType == "jpg" || fileType == "jpe" || fileType == "png" || fileType == "jfif")
-    {
-      editErrors.value.imageFormat = true;
-      
-      if(imageSize < 1.5) {
-        editErrors.value.imageSize = true;  
-        newUser.value.file = e.target.files[0];
-        props.customer.profileImageUrl = null;
-        const reader = new FileReader();
-        reader.readAsDataURL(image);
-        reader.onload = e =>{
-          previewImage.value = e.target.result;
-        };
-      }  
-      else {
-        editErrors.value.imageSize = false;
-      }
-      
-    }
-    else {
-      editErrors.value.imageFormat = false;
-    }
-    
-  }
-  
-}
-
 </script>

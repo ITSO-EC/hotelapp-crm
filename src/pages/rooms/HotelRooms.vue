@@ -91,46 +91,132 @@ const registerModalOpen = ref(false);
 const previewImage = ref(DefaultImage);
 const rooms = ref([
   {
-    name: "Hab. Doble Superior",
-    image:"https://friendsquito.com/wp-content/uploads/2022/07/FRIENDS-40.jpg",
-    description: "Para 1 ó 2 personas",
-    number: 112,
-
-  } ,
-  {
-    name: "Doble Superior con Balcón",
-    image: "https://friendsquito.com/wp-content/uploads/2022/07/FRIENDS-29.jpg",
-    description: "Para 1 ó 2 personas",
-    number: 113,
-  }, 
-  {
-    name: "Hab. Doble Twin",
-    image:"https://friendsquito.com/wp-content/uploads/2022/03/DOBLESUP.jpg",
-    description: "Para 2 ó 3 personas",
-    number: 112,
-
-
-  }, {
-    name: "Hab. Triple",
-    image:"https://friendsquito.com/wp-content/uploads/2022/07/FRIENDS-35.jpg",
-    description: "Para 3 ó 4 personas",
-    number: 112,
-
-
-  } ,
-  {
+    //Individual estandar
     name: "Hab. Doble Estándar",
     image: "https://friendsquito.com/wp-content/uploads/2021/06/FRIENDS-9.jpg",
-    description: "Para 1 ó 2 personas",
-    number: 113,
+    description: "11/01/23",
+    number: 102,
   }, 
   {
+    //Individual estandar
+    name: "Hab. Doble Estándar",
+    image: "https://friendsquito.com/wp-content/uploads/2021/06/FRIENDS-9.jpg",
+    description: "11/01/23",
+    number: 103,
+  },
+  {
+    //Apartamento
     name: "Departamento con Cocina",
     image:"https://friendsquito.com/wp-content/uploads/2021/06/FRIENDS-27-1.jpg",
-    description: "Para 2 ó 4 personas",
+    description: "11/01/23",
+    number: 104,
+  }, 
+  {
+    //Balcon Delux
+    name: "Doble Superior con Balcón",
+    image: "https://friendsquito.com/wp-content/uploads/2022/07/FRIENDS-29.jpg",
+    description: "11/01/23",
+    number: 105,
+  }, 
+  {
+    //Balcon Delux
+    name: "Doble Superior con Balcón",
+    image: "https://friendsquito.com/wp-content/uploads/2022/07/FRIENDS-29.jpg",
+    description: "11/01/23",
+    number: 106,
+  },  
+  {
+    //Twin Delux
+    name: "Hab. Doble Twin",
+    image:"https://friendsquito.com/wp-content/uploads/2022/03/DOBLESUP.jpg",
+    description: "11/01/23",
+    number: 107,
+  }, 
+  {
+    //Individual estandar
+    name: "Hab. Doble Estándar",
+    image: "https://friendsquito.com/wp-content/uploads/2021/06/FRIENDS-9.jpg",
+    description: "11/01/23",
+    number: 108,
+  }, 
+  {
+    //Doble delux
+    name: "Hab. Doble Superior",
+    image:"https://friendsquito.com/wp-content/uploads/2022/07/FRIENDS-40.jpg",
+    description: "11/01/23",
+    number: 109,
+
+  },
+  {
+    //Doble delux
+    name: "Hab. Doble Superior",
+    image:"https://friendsquito.com/wp-content/uploads/2022/07/FRIENDS-40.jpg",
+    description: "11/01/23",
+    number: 110,
+
+  },
+  {
+    //Twin Delux
+    name: "Hab. Doble Twin",
+    image:"https://friendsquito.com/wp-content/uploads/2022/03/DOBLESUP.jpg",
+    description: "11/01/23",
+    number: 111,
+  },
+  {
+    //Doble delux
+    name: "Hab. Doble Superior",
+    image:"https://friendsquito.com/wp-content/uploads/2022/07/FRIENDS-40.jpg",
+    description: "--/--/--",
     number: 112,
 
+  },
+  {
+    //Doble delux
+    name: "Hab. Doble Superior",
+    image:"https://friendsquito.com/wp-content/uploads/2022/07/FRIENDS-40.jpg",
+    description: "11/01/23",
+    number: 113,
 
+  },
+  {
+    //Doble delux
+    name: "Hab. Doble Superior",
+    image:"https://friendsquito.com/wp-content/uploads/2022/07/FRIENDS-40.jpg",
+    description: "11/01/23",
+    number: 114,
+
+  }, 
+  {
+    //Twin Delux
+    name: "Hab. Doble Twin",
+    image:"https://friendsquito.com/wp-content/uploads/2022/03/DOBLESUP.jpg",
+    description: "11/01/23",
+    number: 115,
+  },
+  {
+    //Doble delux
+    name: "Hab. Doble Superior",
+    image:"https://friendsquito.com/wp-content/uploads/2022/07/FRIENDS-40.jpg",
+    description: "11/01/23",
+    number: 116,
+
+  },
+  
+  
+  {
+    //Individual estandar
+    name: "Hab. Doble Estándar",
+    image: "https://friendsquito.com/wp-content/uploads/2021/06/FRIENDS-9.jpg",
+    description: "11/01/23",
+    number: 118,
+  }, 
+  
+  {
+    //Individual estandar
+    name: "Hab. Doble Estándar",
+    image: "https://friendsquito.com/wp-content/uploads/2021/06/FRIENDS-9.jpg",
+    description: "11/01/23",
+    number: 119,
   }
 ])
 

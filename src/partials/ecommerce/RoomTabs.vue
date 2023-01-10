@@ -15,7 +15,31 @@
       <div class="grow p-5">
         <!-- Menu button -->
         <div class="relative">
-          <EditMenu align="right" class="absolute top-0 right-0 inline-flex">
+          <div v-if="getGuests(item?.number) == null" class="absolute top-0 left-0 inline-flex bg-green-500 text-slate-800 px-4 rounded-full shadow">
+            <span>Disponible</span>   
+          </div>
+          <div v-else class="absolute top-0 left-0 inline-flex bg-red-500 text-slate-800 font-bold px-4 rounded-full shadow">
+            <span>No disponible</span>   
+          </div>
+
+          <EditMenu align="right" class="absolute top-0 right-0 inline-flex ">
+            <!-- Edit CheckOut  -->
+            <li v-if="getGuests(item?.number) != null && getGuests(item?.number).length > 0">
+              <button
+                class="
+                  font-medium
+                  text-sm text-slate-600
+                  hover:text-slate-800
+                  flex
+                  py-1
+                  px-3
+                "
+                @click.stop="coModalOpen = true"
+                >Editar Checkout</button
+              >
+            </li>
+
+            <!-- See Guests -->
             <li>
               <button
                 class="
@@ -27,34 +51,11 @@
                   px-3
                 "
                 @click.stop="basicModalOpen = true"
-                >Editar perfil</button
+                >Ver Huéspedes</button
               >
             </li>
-         
-
-            <li v-if="item.allowQualify"><button  
-              @click="editUser({allowQualify: false}, item.id).then((res)=>initializeAdmins())"
-              class="
-                  font-medium
-                  text-sm text-rose-500
-                  hover:text-rose-600
-                  flex
-                  py-1
-                  px-3
-                ">Prohibir Review</button></li>
-            <li v-else  ><button 
-              @click="editUser({allowQualify: true}, item.id).then((res)=>initializeAdmins())"
-              
-              class="
-                  font-medium
-                  text-sm text-emerald-500
-                  hover:text-emerald-600
-                  flex
-                  py-1
-                  px-3
-                "> Habilitar Review</button></li>
             
-                
+            <!-- Empty Room -->
             <li>
               <button
                 class="
@@ -67,7 +68,7 @@
                 "
                
                 @click.stop="dangerModalOpen = true"
-                >Eliminar</button
+                >Vaciar Habitación</button
               >
             </li>
           </EditMenu>
@@ -95,150 +96,130 @@
               </h2>
             </router-link>
           </div>
-          <div class="flex justify-center items-center">
+          <div class="flex justify-center gap-8 items-center">
             
-            <span>{{ item.number }}</span>
+            <p><span class="font-bold">Número: </span>{{ item.number }}</p>
+            <p><span class="font-bold">Huéspedes: </span>{{getGuests(item.number) ? getGuests(item.number).length:0}}</p>
           </div>
         </header>
         <!-- Bio -->
         <div class="text-center mt-2">
-          <div class="text-sm">{{ item.description }}</div>
+          <div class="text-sm">
+            <p><span class="font-bold">Check-Out: </span>{{ getCheckout(item.number) }}</p>
+          </div>
         </div>
       </div>
       
     </div>
-    <!-- Edit Profile -->
-    <ModalBasic
-      :modalOpen="basicModalOpen"
-      @close-modal="basicModalOpen = false"
-      title="Editar Staff"
-    >
+    
+    <!-- Change Checkout -->
+    <ModalBasic  
+      :modalOpen="coModalOpen"
+      @close-modal="coModalOpen = false"
+      :title="`Habitación ${item.number}`">
       <!-- Modal content -->
       <div class="px-5 pt-4 pb-1">
-        <div class="text-sm">
-          <div class="font-medium text-slate-800 mb-2">
-            Para cambiar la foto de perfil, haga click sobre ella.
-          </div>
-
-          <!-- Form Start -->
-          <div class="space-y-2 grid grid-cols-1 sm:grid-cols-2 gap-4">
-            
-            
-             <!-- Image - Error Messages -->
-             <div class="flex flex-col">
-              <p class="text-xs text-red-500 font-medium italic mt-2" for="name-create" :hidden="editErrors.imageFormat">
-              *  El formato de Imagen no es permitido (Solo "jpg", "png" o "jpeg")
-              </p>
-              <p class="text-xs text-red-500 font-medium italic mb-1" for="name-create" :hidden="editErrors.imageSize">
-              *  Imagen muy pesada (Máx. 1.5MB)
-              </p>
-              
+          <div class="text-sm">
+            <div class="font-medium text-slate-800 mb-2">
+              A continuación, elija la nueva fecha de checkout.
             </div>
 
-            <!-- Profile Pic - Image Chooser -->  
-            <div class="flex justify-center sm:col-span-2">
-              <input :id="`image-input-${item.id}`" class="hidden" accept="image/jpeg, image/png, image/jpg" type="file" @change="uploadImage">
-              
-              <img
-                class="rounded-full 
-                cursor-pointer 
-                hover:grayscale ease-in-out duration-300 active:grayscale-0 
-                w-[64px] 
-                h-[64px] 
-                object-cover"
-                :src="`${itemRef.profileImageUrl ? getImage(itemRef.profileImageUrl): previewImage}`"
-                @click.stop="clickInput()"
-                width="64"
-                height="64"
-                :alt="item.name"
-              />
-            </div>
-            
-            <!-- Name Input + Label -->
-            <div>
-              <label class="block text-sm font-medium mb-1 " :for="`name-${item.id}`">
-                Nombre
-              </label>
-              <p class="text-xs text-red-500 font-medium italic mb-1 mt-2" for="name-create" :hidden="editErrors.name">
-                *  El nombre no puede estar vacío
-              </p>
-
-              <input :id="`name-${item.id}`" class="form-input w-full" type="text" v-model="itemRef.name" />
-            </div>
-            
-            <!-- Mail Input + Label -->
-            <div>
-              <label class="block text-sm font-medium mb-1 " :for="`email-${item.id}`">
-                Correo
-              </label>
-              <p class="text-xs text-red-500 font-medium italic mb-1 mt-2" for="name-create" :hidden="editErrors.mail">
-              *  El correo no es válido
-              </p>
-
-              <input :id="`email-${item.id}`" class="form-input w-full" type="text" v-model="itemRef.email"/>
-            </div>
-
-            <!-- Cellphone Input + Label -->
-            <div>
-              <label class="block text-sm font-medium mb-1" :for="`cellphone-${item.id}`" >
-                Celular
-              </label>
-              <p class="text-xs text-red-500 font-medium italic mb-1 mt-2" for="name-create" :hidden="editErrors.cellphone">
-              *  El nro. celular no es válido
-              </p>
-              <input :id="`cellphone-${item.id}`" class="form-input w-full" type="text" v-model="itemRef.phoneNumber "/>
-            </div>
-
-            <!-- Role Select + Label -->
-            <div v-if="item.role!='admin'">
-              <label class="block text-sm font-medium mb-1" :for="`role-${item.id}`" 
-                >Rol</label
-              >
-              <select :id="`role-${item.id}`" class="w-full form-select" :value="item.role">
-                <option value="admin">Admin</option>
-                <option value="user">Huesped</option>
-              </select>
-              
+            <!-- Form Start -->
+            <div class="space-y-2 grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <!-- Checkout Input + Label -->
+              <div class="sm:col-span-2">
+                <label class="block text-sm font-medium mb-1 mt-2" for="name-create"
+                  >Checkout
+                </label>
+                <p class="text-xs text-red-500 font-medium italic mb-1 mt-2" for="name-create" :hidden="true">
+                *  La fecha debe ser superior o igual al día actual
+                
+                </p>
+                <input id="name-create" class="form-input w-full" :min="convertDateHTML5(today)" type="date" v-model="newCheckOut" />
+              </div>
             </div>
           </div>
+        
         </div>
-      </div>
-      <!-- Modal footer -->
-      <div class="px-5 py-4">
-        <div class="flex flex-wrap justify-end space-x-2">
-          <button
-            class="
-              btn-sm
-              border-slate-200
-              hover:border-slate-300
-              text-slate-600
-            "
-            @click.stop="basicModalOpen = false"
-          >
-            Cancelar
-          </button>
-          <button 
-          @click="updateUser"
-          :disabled="!isNewUserValid || loading"
-          class="btn-sm disabled:bg-indigo-300 bg-indigo-500 hover:bg-indigo-600 text-white">
-            <span :hidden="loading">Guardar</span>
-            <span :hidden="!loading">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="animate-spin h-5 w-5 mx-5">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
-              </svg>
-            </span>
-          </button>
+        <!-- Modal footer -->
+        <div class="px-5 py-4">
+          <div class="flex flex-wrap justify-end space-x-2">
+            <button
+              class="
+                btn-sm
+                border-slate-200
+                hover:border-slate-300
+                text-slate-600
+              "
+              @click.stop="coModalOpen = false"
+            >
+              Cancelar
+            </button>
+            <button 
+            :disabled="newCheckOutDate == '' || loading"
+            @click="updateRoom({'checkOutTime': newCheckOutDate}, getRoomID(item?.number))"
+            class="btn-sm disabled:bg-indigo-300 bg-indigo-500 hover:bg-indigo-600 text-white">
+              <span :hidden="loading" >Aceptar</span>
+              <span :hidden="!loading">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="animate-spin h-5 w-5 mx-5">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
+                </svg>
+              </span>
+            </button>
+          </div>
         </div>
-      </div>
     </ModalBasic>
+    <!-- Users Assigned -->
+    <ModalBasic  
+      :modalOpen="basicModalOpen"
+      @close-modal="basicModalOpen = false"
+      :title="`Huéspedes - Habitación ${item.number}`">
+      <!-- Modal content -->
+      <div class="px-5 pt-4 pb-1">
+          <div class="text-sm" v-if="getGuests(item?.number) != null">
+            <div class="font-medium text-slate-800 mb-2">
+              A continuación, se presentan todos los huéspedes asignados a esta habitación.
+            </div>
 
-  
-    <!-- Delete Profile -->
-    <ModalBlank
-      id="danger-modal"
-      :modalOpen="dangerModalOpen"
-      @close-modal="dangerModalOpen = false"
-    >
+            <!-- Form Start -->
+            <div class="space-y-2 grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <SmallCustomersTable class="col-span-2" :users="getGuests(item.number)"/>
+            </div>
+          </div>
+          <div class="text-sm" v-else>
+            <div class="font-medium text-slate-800 mb-2">
+              No se han registrado huéspedes aún.
+            </div>
+            <button
+            @click="router.push('/ecommerce/customers')" 
+            class="btn-sm disabled:bg-indigo-300 bg-indigo-500 hover:bg-indigo-600 text-white">
+              <span >Agregar</span>
+              <span class="rotate-45 ml-2">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+
+              </span>
+            </button>
+          </div>
+        </div>
+        <!-- Modal footer -->
+        <div class="px-5 py-4">
+          <div class="flex flex-wrap justify-end space-x-2">
+         
+            <button 
+            @click="basicModalOpen = false"
+            class="btn-sm disabled:bg-indigo-300 bg-indigo-500 hover:bg-indigo-600 text-white">
+              <span >Aceptar</span>
+             
+            </button>
+          </div>
+        </div>
+    </ModalBasic>
+    <!-- UnAssign All Guests Room -->
+    <ModalBlank  :modalOpen="dangerModalOpen"
+      @close-modal="dangerModalOpen = false">
+      
       <div class="p-5 flex space-x-4">
         <!-- Icon -->
         <div
@@ -267,13 +248,14 @@
           <!-- Modal header -->
           <div class="mb-2">
             <div class="text-lg font-semibold text-slate-800">
-              ¿Está seguro que desea eliminar este perfil?
+              ¿Está seguro que desea retirar a todos los huéspedes de esta habitación?
             </div>
           </div>
           <!-- Modal content -->
           <div class="text-sm mb-10">
             <div class="space-y-2">
-              <p>Considere que esta acción es irreversible.</p>
+              <p>Considere que deberá reasignarlos.</p>
+            
             </div>
           </div>
           <!-- Modal footer -->
@@ -290,14 +272,22 @@
               Cancelar
             </button>
             <button 
-            @click.stop="deleteUser(item.id); dangerModalOpen=false"
-            class="btn-sm bg-rose-500 hover:bg-rose-600 text-white">
-              Si, eliminar
+            @click.stop="emptyRoom(getRoomID(item.number),getGuests(item.number)),dangerModalOpen=false"
+            :disabled="loading"
+            class="btn-sm bg-rose-500 disabled:bg-rose-300 hover:bg-rose-600 text-white">
+              
+              <span :hidden="loading" >Si, vaciar </span>
+              <span :hidden="!loading">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="animate-spin h-5 w-5 mx-5">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
+                </svg>
+              </span>
             </button>
           </div>
         </div>
       </div>
     </ModalBlank>
+
   </div>
 </template>
 
@@ -308,11 +298,12 @@
 
 //Vue + Components
 import { ref, watch } from "vue";
+import { useRouter } from "vue-router";
 
 import EditMenu from "../../components/DropdownEditMenu.vue";
 import ModalBasic from "../../components/ModalBasic.vue";
 import ModalBlank from '../../components/ModalBlank.vue'
-
+import SmallCustomersTable from './SmallCustomersTable.vue'
 //Composables
 import useRooms from '../../composables/useRooms'
 
@@ -321,24 +312,77 @@ import useRooms from '../../composables/useRooms'
 //////////////////////////////////////////
 //Vue Related Init
 const props = defineProps(['item']);
+const router = useRouter();
 
 //Composables Init
-const { rooms } = useRooms();
+const { rooms, initializeRooms, loading,updateRoom, emptyRoom } = useRooms();
 //Refs Init
 const basicModalOpen = ref(false);
-const roleModalOpen = ref(false);
+const coModalOpen = ref(false);
 const dangerModalOpen = ref(false);
-
+const today = new Date();
+const newCheckOut = ref('');
+const newCheckOutDate = ref('')
 
 //////////////////////////////////////////
 //Component Functionality 
 //////////////////////////////////////////
 //Core Actions - CRUD / Specific Actions
+const getRoomID = (number) => {
+  const selectedRoom = rooms.value.find((selroom) => selroom.number == number);
+  return selectedRoom?.id;
+}
+const getGuests = (number) => {
+  const selectedRoom = rooms.value.find((selroom) => selroom.number == number);
+  if (selectedRoom?.users.length == 0) return null;
+  return selectedRoom?.users
+}
 
+const getCheckout = (number) => {
+  const selectedRoom = rooms.value.find((selroom) => selroom.number == number);
+  if(selectedRoom?.checkOutTime) return convertDate(selectedRoom?.checkOutTime)
+  return '--/--/--'
+}
+
+watch(newCheckOut, (currentValue) => {
+    newCheckOutDate.value = new Date(currentValue)
+    let day = newCheckOutDate.value.getDate();
+    newCheckOutDate.value.setDate(day +1)
+})
 
 // Edit Form Validation
 
 //Utils - UI / Parsing / Any Other Un-Specific Component Action
+const convertDate = (date) => {
+  const monthNames = ["01", "02", "03", "04", "05", "06",
+  "07", "08", "09", "10", "11", "12", "Error"
+];
 
+  date = new Date(date)
+  let dd = date.getDate(); 
+  let mm = date.getMonth();
+  let yyyy = date.getFullYear(); 
+  if(dd<10){dd='0'+dd} 
+  return date = dd+'/'+monthNames[mm]+'/'+yyyy
+}
+
+const convertDateHTML5 = (date) => {
+  const monthNames = ["01", "02", "03", "04", "05", "06",
+  "07", "08", "09", "10", "11", "12", "Error"
+];
+
+  date = new Date(date)
+  let dd = date.getDate(); 
+  let mm = date.getMonth();
+  let yyyy = date.getFullYear(); 
+  if(dd<10){dd='0'+dd} 
+  return date = yyyy +'-'+monthNames[mm]+'-' + dd
+}
+//Possible hydration
+
+if(rooms.value.length < 1)
+{
+  initializeRooms()
+}
 
 </script>

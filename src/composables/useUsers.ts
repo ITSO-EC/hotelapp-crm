@@ -48,7 +48,7 @@ const useUsers = () => {
 
         if(!payload.file) {
             
-          await axios.post(BASE_API+'users', payload, 
+          let response = await axios.post(BASE_API+'users', payload, 
           {
             headers:{
               'Content-Type': 'application/json'
@@ -56,6 +56,7 @@ const useUsers = () => {
           });
           await initializeClients();
           loading.value = false;
+          return response;
         }
         else {
           let response = await axios.post(BASE_API+'users', payload, 
@@ -73,6 +74,7 @@ const useUsers = () => {
           })
           await initializeClients();
           loading.value = false;
+          return response;
         }
 
         
